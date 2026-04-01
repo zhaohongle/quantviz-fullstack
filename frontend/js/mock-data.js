@@ -1,7 +1,8 @@
 // ========== QuantViz Mock Data Generator ==========
-// 数据更新时间：2026-04-01 18:30
+// 数据更新时间：2026-04-01 22:30
 // 数据来源：腾讯财经API (http://qt.gtimg.cn/)
 // 说明：本文件包含所有实时更新的市场数据
+// 版本：v1.1 - 修复K线数据加载问题
 
 // Generate realistic K-line data
 function generateKLineData(basePrice, days = 120, volatility = 0.02) {

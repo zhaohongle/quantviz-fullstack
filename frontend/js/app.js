@@ -183,9 +183,37 @@ function renderDashboard() {
     </section>
 
     <section class="sub-charts" id="sub-charts-section">
-      <div class="glass sub-chart" id="volume-chart-container">
-        <div class="sub-chart-title"><span>📊 成交量</span><button class="close-btn" data-target="volume-chart-container">✕</button></div>
-        <div class="sub-chart-body" id="volume-chart"></div>
+      <div class="glass sub-chart" id="market-sentiment-container">
+        <div class="sub-chart-title"><span>📊 市场情绪</span><button class="close-btn" data-target="market-sentiment-container">✕</button></div>
+        <div class="sub-chart-body" id="market-sentiment" style="padding:20px;">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center;">
+            <div>
+              <div style="font-size:32px;font-weight:700;color:var(--up);" id="up-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:4px;">上涨家数</div>
+            </div>
+            <div>
+              <div style="font-size:32px;font-weight:700;color:var(--down);" id="down-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:4px;">下跌家数</div>
+            </div>
+            <div>
+              <div style="font-size:32px;font-weight:700;color:#ff1744;" id="limit-up-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:4px;">涨停数</div>
+            </div>
+            <div>
+              <div style="font-size:32px;font-weight:700;color:#00e676;" id="limit-down-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:4px;">跌停数</div>
+            </div>
+          </div>
+          <div style="margin-top:20px;height:100px;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;">
+              <div style="font-size:14px;color:var(--text-sec);margin-bottom:8px;">市场强度</div>
+              <div style="width:300px;height:20px;background:var(--glass-bg);border-radius:10px;overflow:hidden;border:1px solid var(--border);">
+                <div id="market-strength-bar" style="height:100%;background:linear-gradient(90deg,var(--down),var(--up));width:50%;transition:width 0.3s;"></div>
+              </div>
+              <div id="market-strength-text" style="font-size:12px;color:var(--text-sec);margin-top:4px;">50%</div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="glass sub-chart" id="macd-chart-container">
         <div class="sub-chart-title"><span>MACD (12, 26, 9)</span><button class="close-btn" data-target="macd-chart-container">✕</button></div>
@@ -233,6 +261,46 @@ function renderDashboard() {
   setTimeout(initDashboardInteractions, 120);
 }
 
+// ========== 更新市场情绪数据 ==========
+function updateMarketSentiment() {
+  const stocks = window.MOCK_STOCKS || [];
+  
+  const upCount = stocks.filter(s => s.changePercent > 0).length;
+  const downCount = stocks.filter(s => s.changePercent < 0).length;
+  const flatCount = stocks.filter(s => s.changePercent === 0).length;
+  const limitUpCount = stocks.filter(s => s.changePercent >= 9.9).length;
+  const limitDownCount = stocks.filter(s => s.changePercent <= -9.9).length;
+  
+  const total = upCount + downCount + flatCount;
+  const strength = total > 0 ? (upCount / total * 100) : 50;
+  
+  // 更新显示
+  const upEl = document.getElementById('up-count');
+  const downEl = document.getElementById('down-count');
+  const limitUpEl = document.getElementById('limit-up-count');
+  const limitDownEl = document.getElementById('limit-down-count');
+  const strengthBar = document.getElementById('market-strength-bar');
+  const strengthText = document.getElementById('market-strength-text');
+  
+  if (upEl) upEl.textContent = upCount;
+  if (downEl) downEl.textContent = downCount;
+  if (limitUpEl) limitUpEl.textContent = limitUpCount;
+  if (limitDownEl) limitDownEl.textContent = limitDownCount;
+  
+  if (strengthBar) {
+    strengthBar.style.width = strength + '%';
+    strengthBar.style.background = strength >= 50 
+      ? `linear-gradient(90deg, rgba(0,230,118,0.3), var(--up))`
+      : `linear-gradient(90deg, var(--down), rgba(255,82,82,0.3))`;
+  }
+  
+  if (strengthText) {
+    const sentiment = strength >= 70 ? '强势' : strength >= 55 ? '偏强' : strength >= 45 ? '平衡' : strength >= 30 ? '偏弱' : '弱势';
+    strengthText.textContent = `${strength.toFixed(1)}% · ${sentiment}`;
+    strengthText.style.color = strength >= 50 ? 'var(--up)' : 'var(--down)';
+  }
+}
+
 function initDashboardInteractions() {
   // Load chart
   loadIndexChart(window.APP_STATE.currentIndex);
@@ -243,6 +311,9 @@ function initDashboardInteractions() {
   // Rankings
   document.getElementById('gainers-list').innerHTML = window.MOCK_RANKING.gainers.map((s, i) => window.createRankRow(s, i + 1)).join('');
   document.getElementById('losers-list').innerHTML = window.MOCK_RANKING.losers.map((s, i) => window.createRankRow(s, i + 1)).join('');
+
+  // Update market sentiment
+  updateMarketSentiment();
 
   // Index card click → switch chart
   document.querySelectorAll('.index-card').forEach(card => {

@@ -82,7 +82,15 @@ function handleRoute() {
 }
 
 function navigate(path) { window.location.hash = '#/' + path; }
-window.navigateToStock = function(code) { navigate('stock/' + code); };
+window.navigateToStock = async function(code) {
+  // 如果数据还未加载，等待加载完成
+  if (!window.MOCK_STOCKS || window.MOCK_STOCKS.length === 0) {
+    if (typeof window.loadAllData === 'function') {
+      await window.loadAllData();
+    }
+  }
+  navigate('stock/' + code);
+};
 
 function updateNavActive(path) {
   document.querySelectorAll('.mobile-tabbar-item').forEach(item => {

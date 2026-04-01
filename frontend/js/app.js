@@ -67,7 +67,7 @@ function handleRoute() {
   disposeAllCharts();
 
   if (path === 'stock' && parts[1]) {
-    renderStockDetail(parts[1]);
+    renderStockDetail(parts[1]); // 现在是async，但可以直接调用
   } else if (path === 'sector' && parts[1]) {
     renderSectorDetail(decodeURIComponent(parts[1]));
   } else if (path === 'watchlist') {
@@ -557,10 +557,24 @@ window.selectNews = function(newsId) {
 };
 
 // ========== Stock Detail ==========
-function renderStockDetail(code) {
+async function renderStockDetail(code) {
   window.APP_STATE.currentPage = 'stock';
   window.APP_STATE.currentStock = code;
   const c = document.getElementById('app-content');
+  
+  // 如果数据还未加载，等待加载
+  if (!window.MOCK_STOCKS || window.MOCK_STOCKS.length === 0) {
+    c.innerHTML = `<div style="text-align:center;padding:80px;color:var(--text-sec);">
+      <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+      <div style="font-size:18px;margin-bottom:8px;">加载中...</div>
+    </div>`;
+    
+    // 等待API数据加载
+    if (typeof window.loadAllData === 'function') {
+      await window.loadAllData();
+    }
+  }
+  
   const stock = window.getStockByCode(code);
 
   if (!stock) {

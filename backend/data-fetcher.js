@@ -16,7 +16,8 @@ const STOCK_CODES = [
 // ========== 抓取指数数据 ==========
 async function fetchIndices() {
   try {
-    const codes = 's_sh000001,s_sz399001,s_sz399006,s_sh000688';
+    // 使用完整版API（不带s_前缀）获取详细数据
+    const codes = 'sh000001,sz399001,sz399006,sh000688';
     const response = await axios.get(`${TENCENT_API}${codes}`, {
       responseType: 'arraybuffer',
       timeout: 10000
@@ -28,22 +29,38 @@ async function fetchIndices() {
     // 解析数据
     const lines = data.trim().split('\n');
     for (const line of lines) {
-      const match = line.match(/v_s_(\w+)="(.+?)";/);
+      const match = line.match(/v_(\w+)="(.+?)";/);
       if (!match) continue;
       
       const code = match[1];
       const fields = match[2].split('~');
       
+      // 字段说明：
+      // fields[3] = 当前价
+      // fields[4] = 昨收
+      // fields[5] = 今开
+      // fields[6] = 成交量
+      // fields[31] = 时间戳
+      // fields[32] = 涨跌
+      // fields[33] = 涨跌幅
+      // fields[33] = 最高
+      // fields[34] = 最低
+      
+      const current = parseFloat(fields[3]);
+      const prevClose = parseFloat(fields[4]);
+      const change = current - prevClose;
+      const changePercent = (change / prevClose) * 100;
+      
       const index = {
         code: formatIndexCode(code),
         name: fields[1],
-        value: parseFloat(fields[3]),
-        change: parseFloat(fields[4]),
-        changePercent: parseFloat(fields[5]),
+        value: current,
+        change: parseFloat(change.toFixed(2)),
+        changePercent: parseFloat(changePercent.toFixed(2)),
         volume: parseInt(fields[6]),
-        amount: parseFloat(fields[9]) * 100000000,
-        high: parseFloat(fields[3]) * 1.005,
-        low: parseFloat(fields[3]) * 0.995
+        amount: parseFloat(fields[37]) * 100000000, // 成交额（亿）
+        high: parseFloat(fields[33]) || current,    // 最高价
+        low: parseFloat(fields[34]) || current       // 最低价
       };
       
       indices.push(index);

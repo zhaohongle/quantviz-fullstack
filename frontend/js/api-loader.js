@@ -1,10 +1,59 @@
 // ========== API数据加载器 ==========
-// 从后端API加载实时数据，替代mock数据
+// 从后端API加载实时数据,替代mock数据
 
 // API配置
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:3000/api'
   : 'https://quantviz-fullstack.onrender.com/api';  // Render后端API
+
+// ========== 数据生成工具函数 ==========
+// 生成K线数据
+function generateKLineData(basePrice, days = 120, volatility = 0.02) {
+  const data = [];
+  let price = basePrice;
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  for (let i = 0; i < days; i++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    
+    // Skip weekends
+    if (date.getDay() === 0 || date.getDay() === 6) continue;
+
+    const change = (Math.random() - 0.48) * volatility * price;
+    const open = price;
+    const close = price + change;
+    const high = Math.max(open, close) * (1 + Math.random() * 0.015);
+    const low = Math.min(open, close) * (1 - Math.random() * 0.015);
+    const volume = Math.floor(Math.random() * 50000 + 10000) * 100;
+
+    data.push({
+      date: date.toISOString().split('T')[0],
+      open: parseFloat(open.toFixed(2)),
+      high: parseFloat(high.toFixed(2)),
+      low: parseFloat(low.toFixed(2)),
+      close: parseFloat(close.toFixed(2)),
+      volume: volume
+    });
+
+    price = close;
+  }
+
+  return data;
+}
+
+// 生成走势图数据
+function generateSparkline(length = 20) {
+  const data = [];
+  let value = 50 + Math.random() * 30;
+  for (let i = 0; i < length; i++) {
+    value += (Math.random() - 0.5) * 8;
+    value = Math.max(10, Math.min(90, value));
+    data.push(parseFloat(value.toFixed(1)));
+  }
+  return data;
+}
 
 // 全局状态
 window.API_STATUS = {
@@ -26,6 +75,23 @@ async function loadAllData() {
     }
     
     const data = await response.json();
+    
+    // 为股票生成K线数据和走势数据（API返回的数据不包含这些）
+    if (data.stocks && Array.isArray(data.stocks)) {
+      data.stocks.forEach(stock => {
+        // 生成K线数据（使用价格作为基准）
+        stock.klineData = generateKLineData(stock.prevClose || stock.price, 120, 0.02);
+        // 生成走势数据
+        stock.sparkline = generateSparkline();
+      });
+    }
+    
+    // 为指数生成走势数据
+    if (data.indices && Array.isArray(data.indices)) {
+      data.indices.forEach(index => {
+        index.sparkline = generateSparkline();
+      });
+    }
     
     // 更新全局数据
     window.MOCK_INDICES = data.indices || [];

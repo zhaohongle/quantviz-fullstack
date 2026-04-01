@@ -185,23 +185,23 @@ function renderDashboard() {
     <section class="sub-charts" id="sub-charts-section">
       <div class="glass sub-chart" id="market-sentiment-container">
         <div class="sub-chart-title"><span>📊 市场情绪</span><button class="close-btn" data-target="market-sentiment-container">✕</button></div>
-        <div class="sub-chart-body" id="market-sentiment" style="padding:30px;">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:30px;text-align:center;">
+        <div class="sub-chart-body" id="market-sentiment" style="padding:20px;display:flex;align-items:center;justify-content:center;">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:40px;text-align:center;">
             <div>
-              <div style="font-size:48px;font-weight:700;color:var(--up);" id="up-count">0</div>
-              <div style="font-size:13px;color:var(--text-sec);margin-top:8px;">上涨</div>
+              <div style="font-size:28px;font-weight:700;color:var(--up);" id="up-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:6px;">上涨</div>
             </div>
             <div>
-              <div style="font-size:48px;font-weight:700;color:var(--down);" id="down-count">0</div>
-              <div style="font-size:13px;color:var(--text-sec);margin-top:8px;">下跌</div>
+              <div style="font-size:28px;font-weight:700;color:var(--down);" id="down-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:6px;">下跌</div>
             </div>
             <div>
-              <div style="font-size:48px;font-weight:700;color:#ff1744;" id="limit-up-count">0</div>
-              <div style="font-size:13px;color:var(--text-sec);margin-top:8px;">涨停</div>
+              <div style="font-size:28px;font-weight:700;color:#ff1744;" id="limit-up-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:6px;">涨停</div>
             </div>
             <div>
-              <div style="font-size:48px;font-weight:700;color:#00e676;" id="limit-down-count">0</div>
-              <div style="font-size:13px;color:var(--text-sec);margin-top:8px;">跌停</div>
+              <div style="font-size:28px;font-weight:700;color:#00e676;" id="limit-down-count">0</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-top:6px;">跌停</div>
             </div>
           </div>
         </div>

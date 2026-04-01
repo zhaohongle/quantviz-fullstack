@@ -4,7 +4,7 @@
 // API配置
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:3000/api'
-  : '/api';  // 生产环境使用相对路径
+  : 'https://quantviz-fullstack.onrender.com/api';  // Render后端API
 
 // 全局状态
 window.API_STATUS = {

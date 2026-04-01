@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="量子财富智能交易平台，提供实时股票行情、K线图表、技术指标分析">
+  <meta name="keywords" content="量化交易,股票行情,K线图,技术指标,MACD,KDJ,数据可视化">
+  <title>量子财富智能交易平台 - 实时行情</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+
+<!-- Particle Background Canvas -->
+<canvas id="particles"></canvas>
+
+<!-- Page Container -->
+<div class="page">
+  
+  <!-- Top Navigation -->
+  <nav class="topnav">
+    <div class="logo" onclick="window.location.hash='#/'">
+      量子财富<span>智能交易平台</span>
+    </div>
+    <span style="font-size:11px;color:var(--text-sec);white-space:nowrap;">360安全龙虾支持</span>
+
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="输入股票代码、名称或拼音首字母搜索…" autocomplete="off">
+      <div class="search-dropdown"></div>
+    </div>
+
+    <div class="nav-actions">
+      <div class="nav-btn" title="自选股">⭐</div>
+      <div class="nav-btn" title="暗色/亮色主题切换">🌙</div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area (SPA) -->
+  <div id="app-content"></div>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <div class="mobile-tabbar" style="display: none;">
+    <div class="mobile-tabbar-item active" data-path="dashboard" onclick="window.location.hash='#/'">
+      <span class="mobile-tabbar-icon">🏠</span>
+      首页
+    </div>
+    <div class="mobile-tabbar-item" data-path="stock" onclick="window.location.hash='#/'">
+      <span class="mobile-tabbar-icon">📊</span>
+      行情
+    </div>
+    <div class="mobile-tabbar-item" data-path="watchlist" onclick="window.location.hash='#/watchlist'">
+      <span class="mobile-tabbar-icon">⭐</span>
+      自选
+    </div>
+    <div class="mobile-tabbar-item" data-path="news" onclick="window.location.hash='#/news'">
+      <span class="mobile-tabbar-icon">⚡</span>
+      快讯
+    </div>
+  </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="js/mock-data.js"></script>
+<script src="js/api-loader.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/components.js"></script>
+<script src="js/app.js"></script>
+
+<!-- Mobile Detection & Tab Bar Display -->
+<script>
+  // Show mobile tab bar on small screens
+  function checkMobile() {
+    const isMobile = window.innerWidth <= 768;
+    const tabbar = document.querySelector('.mobile-tabbar');
+    if (tabbar) {
+      tabbar.style.display = isMobile ? 'flex' : 'none';
+    }
+  }
+  
+  window.addEventListener('resize', checkMobile);
+  checkMobile();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+version: 2
+services:
+  # 后端API服务
+  - type: web
+    name: quantviz-api
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    
+  # 前端静态站点
+  - type: web
+    name: quantviz-frontend
+    env: static
+    plan: free
+    buildCommand: ""
+    staticPublishPath: frontend
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://quantviz-api.onrender.com/api/*

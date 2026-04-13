@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 精选推荐 + 准确率追踪 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 20px 32px;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .recommendations-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stock-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .stock-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #1E3A8A;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .stock-rank {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .stock-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .stock-code {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+
+        .stock-industry {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rating-stars {
+            color: #F59E0B;
+            font-size: 16px;
+        }
+
+        .rating-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #F59E0B;
+        }
+
+        .stock-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .current-price {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .price-change {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .price-change.up {
+            color: #EF4444;
+        }
+
+        .price-change.down {
+            color: #10B981;
+        }
+
+        .price-indicators {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .price-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .price-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .price-value.buy {
+            color: #1E3A8A;
+        }
+
+        .price-value.target {
+            color: #EF4444;
+        }
+
+        .price-value.stop {
+            color: #10B981;
+        }
+
+        .recommendation-reason {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background-color: #F59E0B;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #FCD34D;
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background-color: #FFFFFF;
+            color: #1E3A8A;
+            border: 1px solid #1E3A8A;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #DBEAFE;
+        }
+
+        .accuracy-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .accuracy-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .accuracy-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            min-width: 100px;
+        }
+
+        .accuracy-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1E3A8A;
+        }
+
+        .accuracy-detail {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .accuracy-trend {
+            font-size: 16px;
+        }
+
+        .accuracy-trend.up {
+            color: #10B981;
+        }
+
+        .accuracy-trend.flat {
+            color: #6B7280;
+        }
+
+        .btn-history {
+            background-color: transparent;
+            color: #1E3A8A;
+            border: 1px solid #1E3A8A;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 16px;
+        }
+
+        .btn-history:hover {
+            background-color: #DBEAFE;
+        }
+
+        /* 响应式 - 移动端 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .stock-card {
+                padding: 16px;
+            }
+
+            .stock-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .stock-info {
+                flex-wrap: wrap;
+            }
+
+            .price-indicators {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .card-actions button {
+                width: 100%;
+            }
+
+            .accuracy-item {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 AI 精选推荐 + 准确率追踪</h1>
+    </div>
+
+    <div class="container">
+        <!-- AI 精选推荐 -->
+        <div class="recommendations-section">
+            <h2 class="section-title">🎯 今日 AI 精选推荐（5 只）</h2>
+
+            <!-- 推荐 1 -->
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-info">
+                        <span class="stock-rank">1.</span>
+                        <span class="stock-name">药明康德</span>
+                        <span class="stock-code">(603259)</span>
+                        <span class="stock-industry">· 医药</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-stars">⭐⭐⭐</span>
+                        <span class="rating-label">强烈推荐</span>
+                    </div>
+                </div>
+
+                <div class="stock-price-row">
+                    <span class="current-price">当前价: ¥103.81</span>
+                    <span class="price-change up">+5.82%</span>
+                </div>
+
+                <div class="price-indicators">
+                    <div class="price-item">
+                        <span class="price-label">买入价</span>
+                        <span class="price-value buy">¥100-102</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">目标价</span>
+                        <span class="price-value target">¥115</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">止损价</span>
+                        <span class="price-value stop">¥95</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-reason">
+                    推荐理由: CRO 行业景气度持续上行，公司订单饱满，业绩增长确定性强，多家机构给予买入评级。技术面显示多头排列，MACD 金叉，成交量放大。
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-primary">查看完整分析</button>
+                    <button class="btn-secondary">加入自选</button>
+                </div>
+            </div>
+
+            <!-- 推荐 2 -->
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-info">
+                        <span class="stock-rank">2.</span>
+                        <span class="stock-name">北方华创</span>
+                        <span class="stock-code">(002371)</span>
+                        <span class="stock-industry">· 半导体</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-stars">⭐⭐⭐</span>
+                        <span class="rating-label">强烈推荐</span>
+                    </div>
+                </div>
+
+                <div class="stock-price-row">
+                    <span class="current-price">当前价: ¥312.45</span>
+                    <span class="price-change up">+3.78%</span>
+                </div>
+
+                <div class="price-indicators">
+                    <div class="price-item">
+                        <span class="price-label">买入价</span>
+                        <span class="price-value buy">¥305-310</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">目标价</span>
+                        <span class="price-value target">¥350</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">止损价</span>
+                        <span class="price-value stop">¥290</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-reason">
+                    推荐理由: 国产半导体设备龙头，国产替代加速，订单快速增长，盈利能力持续改善。技术面突破前期高点，RSI 指标强势，资金流入明显。
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-primary">查看完整分析</button>
+                    <button class="btn-secondary">加入自选</button>
+                </div>
+            </div>
+
+            <!-- 推荐 3 -->
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-info">
+                        <span class="stock-rank">3.</span>
+                        <span class="stock-name">宁德时代</span>
+                        <span class="stock-code">(300750)</span>
+                        <span class="stock-industry">· 新能源</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-stars">⭐⭐</span>
+                        <span class="rating-label">推荐</span>
+                    </div>
+                </div>
+
+                <div class="stock-price-row">
+                    <span class="current-price">当前价: ¥182.35</span>
+                    <span class="price-change up">+2.15%</span>
+                </div>
+
+                <div class="price-indicators">
+                    <div class="price-item">
+                        <span class="price-label">买入价</span>
+                        <span class="price-value buy">¥178-180</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">目标价</span>
+                        <span class="price-value target">¥200</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">止损价</span>
+                        <span class="price-value stop">¥170</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-reason">
+                    推荐理由: 动力电池全球龙头，市占率稳定，新技术储备充足，产能持续扩张。短期受行业竞争影响，但长期增长确定性高。
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-primary">查看完整分析</button>
+                    <button class="btn-secondary">加入自选</button>
+                </div>
+            </div>
+
+            <!-- 推荐 4 -->
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-info">
+                        <span class="stock-rank">4.</span>
+                        <span class="stock-name">海康威视</span>
+                        <span class="stock-code">(002415)</span>
+                        <span class="stock-industry">· 人工智能</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-stars">⭐⭐</span>
+                        <span class="rating-label">推荐</span>
+                    </div>
+                </div>
+
+                <div class="stock-price-row">
+                    <span class="current-price">当前价: ¥38.52</span>
+                    <span class="price-change up">+1.88%</span>
+                </div>
+
+                <div class="price-indicators">
+                    <div class="price-item">
+                        <span class="price-label">买入价</span>
+                        <span class="price-value buy">¥37-38</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">目标价</span>
+                        <span class="price-value target">¥42</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">止损价</span>
+                        <span class="price-value stop">¥35</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-reason">
+                    推荐理由: AI 视觉龙头，业务转型顺利，海外市场拓展加速，估值处于历史低位，具备估值修复空间。
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-primary">查看完整分析</button>
+                    <button class="btn-secondary">加入自选</button>
+                </div>
+            </div>
+
+            <!-- 推荐 5 -->
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-info">
+                        <span class="stock-rank">5.</span>
+                        <span class="stock-name">隆基绿能</span>
+                        <span class="stock-code">(601012)</span>
+                        <span class="stock-industry">· 光伏</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-stars">⭐</span>
+                        <span class="rating-label">观察</span>
+                    </div>
+                </div>
+
+                <div class="stock-price-row">
+                    <span class="current-price">当前价: ¥22.18</span>
+                    <span class="price-change up">+0.95%</span>
+                </div>
+
+                <div class="price-indicators">
+                    <div class="price-item">
+                        <span class="price-label">买入价</span>
+                        <span class="price-value buy">¥21-22</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">目标价</span>
+                        <span class="price-value target">¥25</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">止损价</span>
+                        <span class="price-value stop">¥20</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-reason">
+                    推荐理由: 光伏组件龙头，行业竞争加剧，短期业绩承压，但长期需求增长确定。技术面处于底部震荡，适合波段操作。
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-primary">查看完整分析</button>
+                    <button class="btn-secondary">加入自选</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 准确率追踪 -->
+        <div class="accuracy-section">
+            <h2 class="section-title">📊 准确率追踪</h2>
+
+            <div class="accuracy-item">
+                <span class="accuracy-label">7 日准确率:</span>
+                <span class="accuracy-value">58%</span>
+                <span class="accuracy-detail">(12/21)</span>
+                <span class="accuracy-trend up">↗</span>
+            </div>
+
+            <div class="accuracy-item">
+                <span class="accuracy-label">30 日准确率:</span>
+                <span class="accuracy-value">55%</span>
+                <span class="accuracy-detail">(48/87)</span>
+                <span class="accuracy-trend flat">→</span>
+            </div>
+
+            <button class="btn-history">查看详细追踪记录</button>
+        </div>
+    </div>
+</body>
+</html>

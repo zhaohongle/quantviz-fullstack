@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加载/空/错误状态组件 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            padding: 32px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        .demo-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #111827;
+        }
+
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .state-demo {
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 加载状态 - 旋转圆圈 */
+        .loading-spinner {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #E5E7EB;
+            border-top-color: #1E3A8A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* 加载状态 - 骨架屏 */
+        .skeleton-card {
+            width: 100%;
+        }
+
+        .skeleton-line {
+            height: 16px;
+            background: linear-gradient(
+                90deg,
+                #F3F4F6 25%,
+                #E5E7EB 50%,
+                #F3F4F6 75%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(
+                90deg,
+                #F3F4F6 25%,
+                #E5E7EB 50%,
+                #F3F4F6 75%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+            border-radius: 50%;
+            margin-bottom: 16px;
+        }
+
+        /* 加载状态 - 进度条 */
+        .progress-container {
+            width: 100%;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #1E3A8A;
+            width: 60%;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 80%; }
+            100% { width: 100%; }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            width: 100%;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: #3B82F6;
+        }
+
+        /* 错误状态 */
+        .error-state {
+            width: 100%;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .error-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #EF4444;
+            margin-bottom: 8px;
+        }
+
+        .error-text {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 20px;
+        }
+
+        .btn-retry {
+            background-color: #EF4444;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-retry:hover {
+            background-color: #DC2626;
+        }
+
+        /* 成功状态 */
+        .success-state {
+            width: 100%;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #10B981;
+            margin-bottom: 8px;
+        }
+
+        .success-text {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* 代码示例 */
+        .code-block {
+            background-color: #111827;
+            color: #F9FAFB;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        .demo-note {
+            background-color: #DBEAFE;
+            border-left: 4px solid #1E3A8A;
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1E3A8A;
+        }
+
+        /* 表格卡片骨架屏 */
+        .skeleton-table {
+            width: 100%;
+        }
+
+        .skeleton-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-cell {
+            height: 16px;
+            background: linear-gradient(
+                90deg,
+                #F3F4F6 25%,
+                #E5E7EB 50%,
+                #F3F4F6 75%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+            border-radius: 4px;
+        }
+
+        .skeleton-cell.small {
+            flex: 1;
+        }
+
+        .skeleton-cell.large {
+            flex: 2;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="demo-title">📐 加载/空/错误状态组件规范</h1>
+
+    <!-- 加载状态 -->
+    <div class="demo-section">
+        <h2 class="section-title">1. 加载状态（Loading States）</h2>
+        <div class="state-grid">
+            <!-- 旋转圆圈 -->
+            <div class="state-demo">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <div class="loading-text">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 骨架屏 - 卡片 -->
+            <div class="state-demo">
+                <div class="skeleton-card">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-line" style="width: 80%;"></div>
+                    <div class="skeleton-line" style="width: 60%;"></div>
+                    <div class="skeleton-line" style="width: 90%;"></div>
+                </div>
+            </div>
+
+            <!-- 进度条 -->
+            <div class="state-demo">
+                <div class="progress-container">
+                    <div class="progress-text">正在加载数据...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>使用场景：</strong><br>
+            • 旋转圆圈：全局加载、按钮提交<br>
+            • 骨架屏：列表/卡片首次加载<br>
+            • 进度条：大文件上传、数据导入
+        </div>
+
+        <div class="code-block">
+&lt;!-- 旋转圆圈 --&gt;
+&lt;div class="loading-spinner"&gt;
+    &lt;div class="spinner"&gt;&lt;/div&gt;
+    &lt;div class="loading-text"&gt;加载中...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 骨架屏 --&gt;
+&lt;div class="skeleton-card"&gt;
+    &lt;div class="skeleton-avatar"&gt;&lt;/div&gt;
+    &lt;div class="skeleton-line" style="width: 80%;"&gt;&lt;/div&gt;
+    &lt;div class="skeleton-line" style="width: 60%;"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- CSS 动画 --&gt;
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+        </div>
+    </div>
+
+    <!-- 骨架屏 - 表格 -->
+    <div class="demo-section">
+        <h2 class="section-title">2. 骨架屏 - 表格/列表</h2>
+        <div class="state-demo">
+            <div class="skeleton-table">
+                <div class="skeleton-row">
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell large"></div>
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell small"></div>
+                </div>
+                <div class="skeleton-row">
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell large"></div>
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell small"></div>
+                </div>
+                <div class="skeleton-row">
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell large"></div>
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell small"></div>
+                </div>
+                <div class="skeleton-row">
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell large"></div>
+                    <div class="skeleton-cell small"></div>
+                    <div class="skeleton-cell small"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>表格骨架屏：</strong><br>
+            • 模拟表格行列结构<br>
+            • 使用不同宽度表示不同列<br>
+            • 适合成分股列表、资金流向表格
+        </div>
+    </div>
+
+    <!-- 空状态 -->
+    <div class="demo-section">
+        <h2 class="section-title">3. 空状态（Empty States）</h2>
+        <div class="state-grid">
+            <!-- 无数据 -->
+            <div class="state-demo">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <div class="empty-title">暂无数据</div>
+                    <div class="empty-text">当前没有可显示的内容</div>
+                    <button class="btn-action">刷新页面</button>
+                </div>
+            </div>
+
+            <!-- 无自选股 -->
+            <div class="state-demo">
+                <div class="empty-state">
+                    <div class="empty-icon">⭐</div>
+                    <div class="empty-title">暂无自选股</div>
+                    <div class="empty-text">快去添加你感兴趣的股票吧</div>
+                    <button class="btn-action">去添加</button>
+                </div>
+            </div>
+
+            <!-- 无搜索结果 -->
+            <div class="state-demo">
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <div class="empty-title">未找到相关结果</div>
+                    <div class="empty-text">请尝试其他关键词</div>
+                    <button class="btn-action">清空搜索</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>使用场景：</strong><br>
+            • 无数据：列表为空<br>
+            • 无自选股：用户未添加自选<br>
+            • 无搜索结果：搜索无匹配项
+        </div>
+
+        <div class="code-block">
+&lt;div class="empty-state"&gt;
+    &lt;div class="empty-icon"&gt;📭&lt;/div&gt;
+    &lt;div class="empty-title"&gt;暂无数据&lt;/div&gt;
+    &lt;div class="empty-text"&gt;当前没有可显示的内容&lt;/div&gt;
+    &lt;button class="btn-action"&gt;刷新页面&lt;/button&gt;
+&lt;/div&gt;
+        </div>
+    </div>
+
+    <!-- 错误状态 -->
+    <div class="demo-section">
+        <h2 class="section-title">4. 错误状态（Error States）</h2>
+        <div class="state-grid">
+            <!-- 加载失败 -->
+            <div class="state-demo">
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">数据加载失败</div>
+                    <div class="error-text">网络连接异常，请重试</div>
+                    <button class="btn-retry">重新加载</button>
+                </div>
+            </div>
+
+            <!-- 服务器错误 -->
+            <div class="state-demo">
+                <div class="error-state">
+                    <div class="error-icon">🔧</div>
+                    <div class="error-title">服务器错误</div>
+                    <div class="error-text">服务暂时不可用，请稍后再试</div>
+                    <button class="btn-retry">返回首页</button>
+                </div>
+            </div>
+
+            <!-- 权限不足 -->
+            <div class="state-demo">
+                <div class="error-state">
+                    <div class="error-icon">🔒</div>
+                    <div class="error-title">权限不足</div>
+                    <div class="error-text">此功能需要升级会员</div>
+                    <button class="btn-action">立即升级</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>使用场景：</strong><br>
+            • 加载失败：网络错误、API 调用失败<br>
+            • 服务器错误：500/503 错误<br>
+            • 权限不足：未登录或权限受限
+        </div>
+
+        <div class="code-block">
+&lt;div class="error-state"&gt;
+    &lt;div class="error-icon"&gt;⚠️&lt;/div&gt;
+    &lt;div class="error-title"&gt;数据加载失败&lt;/div&gt;
+    &lt;div class="error-text"&gt;网络连接异常，请重试&lt;/div&gt;
+    &lt;button class="btn-retry"&gt;重新加载&lt;/button&gt;
+&lt;/div&gt;
+        </div>
+    </div>
+
+    <!-- 成功状态 -->
+    <div class="demo-section">
+        <h2 class="section-title">5. 成功状态（Success States）</h2>
+        <div class="state-grid">
+            <!-- 操作成功 -->
+            <div class="state-demo">
+                <div class="success-state">
+                    <div class="success-icon">✅</div>
+                    <div class="success-title">添加成功</div>
+                    <div class="success-text">已添加到自选股</div>
+                </div>
+            </div>
+
+            <!-- 提交成功 -->
+            <div class="state-demo">
+                <div class="success-state">
+                    <div class="success-icon">🎉</div>
+                    <div class="success-title">提交成功</div>
+                    <div class="success-text">您的反馈已收到，感谢支持</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>使用场景：</strong><br>
+            • 操作成功提示（短暂显示后自动消失）<br>
+            • 表单提交成功<br>
+            • 文件上传完成
+        </div>
+    </div>
+
+    <!-- 设计规范总结 -->
+    <div class="demo-section">
+        <h2 class="section-title">6. 设计规范总结</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background-color: #F9FAFB;">
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">状态类型</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">图标大小</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">标题颜色</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">按钮颜色</th>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">加载状态</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">48px</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#6B7280（灰色）</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">N/A</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">空状态</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">64px</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#111827（黑色）</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#1E3A8A（蓝色）</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">错误状态</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">64px</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#EF4444（红色）</td>
+                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#EF4444（红色）</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px;">成功状态</td>
+                <td style="padding: 12px;">64px</td>
+                <td style="padding: 12px;">#10B981（绿色）</td>
+                <td style="padding: 12px;">N/A</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

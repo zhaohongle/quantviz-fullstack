@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>板块资金流向 - 气泡图视图 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+        }
+
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .breadcrumb {
+            background-color: #FFFFFF;
+            padding: 12px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .breadcrumb a {
+            color: #1E3A8A;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .controls-bar {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-range-tabs {
+            display: flex;
+            gap: 12px;
+        }
+
+        .time-tab {
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #FFFFFF;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-tab.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #FFFFFF;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .chart-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%);
+            border: 2px dashed #E5E7EB;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+        }
+
+        .placeholder-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .placeholder-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #6B7280;
+        }
+
+        .placeholder-text {
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .legend-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .legend-color.inflow {
+            background-color: #EF4444;
+        }
+
+        .legend-color.outflow {
+            background-color: #10B981;
+        }
+
+        .legend-label {
+            font-size: 14px;
+            color: #111827;
+        }
+
+        .code-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .code-block {
+            background-color: #111827;
+            color: #F9FAFB;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+
+        .demo-note {
+            background-color: #DBEAFE;
+            border-left: 4px solid #1E3A8A;
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1E3A8A;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .controls-bar {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .chart-container {
+                height: 400px;
+            }
+
+            .legend-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-link">全球指数</a>
+            <a href="#" class="nav-link active">板块资金流向</a>
+            <a href="#" class="nav-link">AI 精选推荐</a>
+            <a href="#" class="nav-link">自选股</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a> / <a href="#">板块资金流向</a> / 气泡图视图
+    </div>
+
+    <div class="container">
+        <div class="controls-bar">
+            <div class="time-range-tabs">
+                <button class="time-tab active">今日</button>
+                <button class="time-tab">近5日</button>
+                <button class="time-tab">近30日</button>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn">☰ 列表视图</button>
+                <button class="view-btn active">● 气泡图视图</button>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="section-title">📊 板块资金流向气泡图</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    <div class="placeholder-icon">📊</div>
+                    <div class="placeholder-title">气泡图视图（ECharts 集成）</div>
+                    <div class="placeholder-text">
+                        X 轴：资金流向金额（流入为正，流出为负）<br>
+                        Y 轴：板块涨跌幅<br>
+                        气泡大小：成交额<br>
+                        气泡颜色：红色（流入）/ 绿色（流出）<br><br>
+                        <strong>开发说明：</strong>使用 ECharts 散点图（scatter）实现，详见下方代码示例
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend-section">
+            <div class="section-title">📌 图例说明</div>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color inflow"></div>
+                    <div class="legend-label">资金流入板块（红色气泡）</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color outflow"></div>
+                    <div class="legend-label">资金流出板块（绿色气泡）</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #1E3A8A;"></div>
+                    <div class="legend-label">小气泡：成交额较小</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #1E3A8A;"></div>
+                    <div class="legend-label">大气泡：成交额较大</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <div class="section-title">💻 ECharts 实现代码</div>
+            <div class="code-block">
+// 数据格式
+const sectorData = [
+    { name: '半导体', amount: 28512, changePct: 4.23, volume: 124500 },
+    { name: '新能源', amount: 21233, changePct: 3.15, volume: 98200 },
+    { name: '银行', amount: -8545, changePct: -1.52, volume: 45600 },
+    // ... 更多板块数据
+];
+
+// ECharts 配置
+const option = {
+    title: {
+        text: '板块资金流向气泡图',
+        left: 'center'
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: function(params) {
+            const data = params.data;
+            return `${data[3]}<br/>
+                资金流向: ${data[0] > 0 ? '+' : ''}${data[0].toFixed(2)} 亿<br/>
+                涨跌幅: ${data[1] > 0 ? '+' : ''}${data[1].toFixed(2)}%<br/>
+                成交额: ${data[2].toFixed(2)} 亿`;
+        }
+    },
+    xAxis: {
+        name: '资金流向（亿元）',
+        nameLocation: 'center',
+        nameGap: 30,
+        splitLine: {
+            show: true,
+            lineStyle: {
+                type: 'dashed',
+                color: '#E5E7EB'
+            }
+        },
+        axisLine: {
+            lineStyle: {
+                color: '#6B7280'
+            }
+        }
+    },
+    yAxis: {
+        name: '涨跌幅（%）',
+        nameLocation: 'center',
+        nameGap: 40,
+        splitLine: {
+            show: true,
+            lineStyle: {
+                type: 'dashed',
+                color: '#E5E7EB'
+            }
+        },
+        axisLine: {
+            lineStyle: {
+                color: '#6B7280'
+            }
+        }
+    },
+    series: [
+        {
+            name: '资金流入',
+            type: 'scatter',
+            symbolSize: function(data) {
+                // 根据成交额计算气泡大小（10-80px）
+                return Math.max(10, Math.min(80, data[2] / 2000));
+            },
+            data: sectorData
+                .filter(d => d.amount > 0)
+                .map(d => [d.amount / 100, d.changePct, d.volume / 100, d.name]),
+            itemStyle: {
+                color: '#EF4444',
+                opacity: 0.7
+            },
+            label: {
+                show: true,
+                formatter: '{@[3]}',
+                position: 'inside',
+                fontSize: 11,
+                color: '#FFFFFF'
+            }
+        },
+        {
+            name: '资金流出',
+            type: 'scatter',
+            symbolSize: function(data) {
+                return Math.max(10, Math.min(80, data[2] / 2000));
+            },
+            data: sectorData
+                .filter(d => d.amount < 0)
+                .map(d => [d.amount / 100, d.changePct, d.volume / 100, d.name]),
+            itemStyle: {
+                color: '#10B981',
+                opacity: 0.7
+            },
+            label: {
+                show: true,
+                formatter: '{@[3]}',
+                position: 'inside',
+                fontSize: 11,
+                color: '#FFFFFF'
+            }
+        }
+    ]
+};
+
+// 初始化图表
+const chartDom = document.getElementById('chart-container');
+const myChart = echarts.init(chartDom);
+myChart.setOption(option);
+
+// 响应式调整
+window.addEventListener('resize', function() {
+    myChart.resize();
+});
+
+// 点击事件
+myChart.on('click', function(params) {
+    const sectorName = params.data[3];
+    // 跳转到板块详情页
+    window.location.href = `/sector/${sectorName}`;
+});
+            </div>
+
+            <div class="demo-note">
+                <strong>📦 依赖库：</strong><br>
+                需要引入 ECharts 库：<br>
+                <code>&lt;script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"&gt;&lt;/script&gt;</code>
+                <br><br>
+                <strong>🎨 设计要点：</strong><br>
+                • X 轴正值为流入（右侧），负值为流出（左侧）<br>
+                • Y 轴正值为上涨，负值为下跌<br>
+                • 气泡大小与成交额成正比<br>
+                • 流入用红色（#EF4444），流出用绿色（#10B981）<br>
+                • 气泡内显示板块名称<br>
+                • 点击气泡跳转到板块详情页
+                <br><br>
+                <strong>🔄 交互说明：</strong><br>
+                • 鼠标悬停显示详细数据（Tooltip）<br>
+                • 点击气泡跳转到板块详情<br>
+                • 支持缩放和拖拽（dataZoom）<br>
+                • 响应式自适应
+            </div>
+        </div>
+    </div>
+
+    <!-- ECharts 引入示例 -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script> -->
+</body>
+</html>

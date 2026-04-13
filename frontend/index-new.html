@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>量子财富 V2 - UI 原型导航（基于现有网站风格）</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container { max-width: 900px; width: 100%; }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .header .subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+        .header .version {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border: 2px solid transparent;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: #F59E0B;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .card-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .card-status {
+            display: inline-block;
+            background: #10B981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .card-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+        .card-desc {
+            font-size: 15px;
+            color: #6B7280;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .feature-tag {
+            background: #F3F4F6;
+            color: #4B5563;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .highlight-section {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            color: white;
+        }
+        .highlight-section h2 {
+            font-size: 22px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .highlight-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .highlight-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 48px;
+            opacity: 0.9;
+        }
+        .footer a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 36px; }
+            .header .subtitle { font-size: 16px; }
+            .card { padding: 24px; }
+            .card-title { font-size: 22px; }
+            .highlight-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 量子财富 V2</h1>
+            <p class="subtitle">UI 原型导航 · 基于现有网站风格</p>
+            <span class="version">✅ Day 1 完成</span>
+        </div>
+
+        <div class="highlight-section">
+            <h2>✨ 设计亮点</h2>
+            <div class="highlight-list">
+                <div class="highlight-item">✅ 保持现有网站风格一致</div>
+                <div class="highlight-item">✅ 完全响应式设计</div>
+                <div class="highlight-item">✅ 专业 UI 设计师制作</div>
+                <div class="highlight-item">✅ 可直接浏览器查看</div>
+            </div>
+        </div>
+
+        <div class="cards">
+            <a href="prd1-global-indices.html" class="card">
+                <div class="card-header">
+                    <span class="card-badge">PRD-1</span>
+                    <span class="card-status">✅ 已完成</span>
+                </div>
+                <div class="card-title">🌍 全球指数 + 实时资讯</div>
+                <div class="card-desc">
+                    两栏布局设计，左侧展示 A 股、美股、港股等全球主要指数实时行情，右侧聚合新浪财经、东方财富、华尔街见闻等多源资讯。设计风格与现有网站完全一致。
+                </div>
+                <div class="card-features">
+                    <span class="feature-tag">指数卡片</span>
+                    <span class="feature-tag">资讯列表</span>
+                    <span class="feature-tag">筛选器</span>
+                    <span class="feature-tag">响应式布局</span>
+                </div>
+            </a>
+
+            <a href="prd2-sector-flow.html" class="card">
+                <div class="card-header">
+                    <span class="card-badge">PRD-2</span>
+                    <span class="card-status">✅ 已完成</span>
+                </div>
+                <div class="card-title">📈 板块资金流向</div>
+                <div class="card-desc">
+                    对称两栏布局，左侧展示资金流入 TOP 10，右侧展示流出 TOP 10。支持时间维度切换和列表视图。使用现有网站的色彩方案和组件风格。
+                </div>
+                <div class="card-features">
+                    <span class="feature-tag">流入流出对比</span>
+                    <span class="feature-tag">进度条可视化</span>
+                    <span class="feature-tag">时间筛选</span>
+                    <span class="feature-tag">排序功能</span>
+                </div>
+            </a>
+
+            <a href="prd3-ai-recommendations.html" class="card">
+                <div class="card-header">
+                    <span class="card-badge">PRD-3</span>
+                    <span class="card-status">✅ 已完成</span>
+                </div>
+                <div class="card-title">🎯 AI 精选推荐 + 准确率追踪</div>
+                <div class="card-desc">
+                    AI 驱动的股票推荐系统，展示每日精选推荐（5只）、推荐等级（星级）、买入/目标/止损价区间、推荐理由，以及透明化的准确率追踪。完全遵循现有网站设计规范。
+                </div>
+                <div class="card-features">
+                    <span class="feature-tag">AI 推荐</span>
+                    <span class="feature-tag">准确率追踪</span>
+                    <span class="feature-tag">价格区间</span>
+                    <span class="feature-tag">星级评分</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p><strong>🎨 设计师</strong>：vibe-design-agent（专业 UI 设计师）</p>
+            <p style="margin-top:12px;"><strong>📅 完成时间</strong>：2026-04-13</p>
+            <p style="margin-top:12px;">参考网站：<a href="https://quantviz-fullstack-nkxq.vercel.app/" target="_blank">量子财富 V1</a></p>
+        </div>
+    </div>
+</body>
+</html>

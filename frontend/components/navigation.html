@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导航栏组件示例 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+        }
+
+        .demo-container {
+            padding: 32px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: #111827;
+        }
+
+        .demo-section {
+            margin-bottom: 48px;
+        }
+
+        .section-label {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #4B5563;
+        }
+
+        /* 桌面端导航栏 */
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .navbar-brand:hover {
+            opacity: 0.9;
+        }
+
+        .navbar-center {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+            border-bottom-color: #F59E0B;
+        }
+
+        .nav-link.active {
+            border-bottom-color: #F59E0B;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            padding: 6px 32px 6px 12px;
+            color: #FFFFFF;
+            font-size: 14px;
+            width: 200px;
+            transition: all 0.2s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .search-input:focus {
+            outline: none;
+            background-color: rgba(255,255,255,0.15);
+            border-color: #F59E0B;
+            width: 250px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 16px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 180px;
+            display: none;
+            z-index: 100;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            color: #111827;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #E5E7EB;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #F9FAFB;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* 移动端导航 */
+        .mobile-navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background-color: #FFFFFF;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+            transition: left 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.show {
+            left: 0;
+        }
+
+        .mobile-menu-header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-close-btn {
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-menu-items {
+            padding: 16px 0;
+        }
+
+        .mobile-menu-item {
+            padding: 16px 20px;
+            color: #111827;
+            font-size: 16px;
+            border-bottom: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .mobile-menu-item:hover {
+            background-color: #F9FAFB;
+        }
+
+        .mobile-menu-item.active {
+            color: #1E3A8A;
+            font-weight: 600;
+            background-color: #DBEAFE;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .menu-overlay.show {
+            display: block;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar-center {
+                display: none;
+            }
+
+            .navbar-right {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        /* 演示说明 */
+        .demo-note {
+            background-color: #DBEAFE;
+            border-left: 4px solid #1E3A8A;
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1E3A8A;
+        }
+
+        .code-block {
+            background-color: #111827;
+            color: #F9FAFB;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 class="demo-title">📐 导航栏组件规范</h1>
+
+        <!-- 桌面端导航栏 -->
+        <div class="demo-section">
+            <div class="section-label">1. 桌面端导航栏（≥768px）</div>
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    🌊 量子财富
+                </div>
+                <div class="navbar-center">
+                    <a href="#" class="nav-link active">全球指数</a>
+                    <a href="#" class="nav-link">板块资金流向</a>
+                    <a href="#" class="nav-link">AI 精选推荐</a>
+                    <a href="#" class="nav-link">自选股</a>
+                </div>
+                <div class="navbar-right">
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="搜索股票/板块">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-avatar">用</div>
+                        <div class="user-dropdown">
+                            <div class="dropdown-item">我的自选</div>
+                            <div class="dropdown-item">账户设置</div>
+                            <div class="dropdown-item">退出登录</div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="demo-note">
+                <strong>状态说明：</strong><br>
+                • 默认状态：白色文字，透明边框<br>
+                • Hover 状态：透明度 0.8，底部橙色边框<br>
+                • Active 状态：底部橙色边框<br>
+                • 搜索框 Focus：背景变亮，橙色边框，宽度增加至 250px
+            </div>
+        </div>
+
+        <!-- 移动端导航栏 -->
+        <div class="demo-section">
+            <div class="section-label">2. 移动端导航栏（<768px）</div>
+            <nav class="mobile-navbar">
+                <div class="navbar-brand">
+                    🌊 量子财富
+                </div>
+                <button class="mobile-menu-btn">☰</button>
+            </nav>
+
+            <div class="demo-note">
+                <strong>移动端菜单：</strong><br>
+                • 点击汉堡菜单图标打开侧边栏<br>
+                • 侧边栏从左侧滑入，宽度 80%（最大 300px）<br>
+                • 包含半透明遮罩层<br>
+                • 点击遮罩或关闭按钮收回侧边栏
+            </div>
+        </div>
+
+        <!-- 用户下拉菜单 -->
+        <div class="demo-section">
+            <div class="section-label">3. 用户下拉菜单</div>
+            <div style="background-color: #1E3A8A; padding: 20px; border-radius: 8px;">
+                <div style="position: relative; display: inline-block;">
+                    <div class="user-avatar">用</div>
+                    <div class="user-dropdown show">
+                        <div class="dropdown-item">我的自选</div>
+                        <div class="dropdown-item">账户设置</div>
+                        <div class="dropdown-item">退出登录</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-note">
+                <strong>交互逻辑：</strong><br>
+                • 点击用户头像显示下拉菜单<br>
+                • 再次点击或点击外部区域关闭菜单<br>
+                • 鼠标悬停菜单项时背景变浅灰
+            </div>
+        </div>
+
+        <!-- CSS 代码示例 -->
+        <div class="demo-section">
+            <div class="section-label">4. CSS 代码示例</div>
+            <div class="code-block">
+/* 导航栏基础样式 */
+.navbar {
+    background-color: #1E3A8A;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 导航链接 */
+.nav-link {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    opacity: 0.8;
+    border-bottom-color: #F59E0B;
+}
+
+.nav-link.active {
+    border-bottom-color: #F59E0B;
+}
+
+/* 搜索框 */
+.search-input:focus {
+    background-color: rgba(255,255,255,0.15);
+    border-color: #F59E0B;
+    width: 250px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .navbar-center, .navbar-right {
+        display: none;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+}
+            </div>
+        </div>
+
+        <!-- JavaScript 交互示例 -->
+        <div class="demo-section">
+            <div class="section-label">5. JavaScript 交互示例</div>
+            <div class="code-block">
+// 用户菜单交互
+document.querySelector('.user-avatar').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+});
+
+document.addEventListener('click', function() {
+    document.querySelector('.user-dropdown').classList.remove('show');
+});
+
+// 移动端菜单交互
+document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+    document.querySelector('.mobile-menu').classList.add('show');
+    document.querySelector('.menu-overlay').classList.add('show');
+});
+
+document.querySelector('.menu-close-btn').addEventListener('click', function() {
+    document.querySelector('.mobile-menu').classList.remove('show');
+    document.querySelector('.menu-overlay').classList.remove('show');
+});
+
+document.querySelector('.menu-overlay').addEventListener('click', function() {
+    document.querySelector('.mobile-menu').classList.remove('show');
+    this.classList.remove('show');
+});
+            </div>
+        </div>
+
+        <!-- 设计规范 -->
+        <div class="demo-section">
+            <div class="section-label">6. 设计规范总结</div>
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden;">
+                <tr style="background-color: #F9FAFB;">
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">元素</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #E5E7EB;">规范</th>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">背景色</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#1E3A8A（深蓝）</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">品牌字体</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">20px，Bold (700)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">导航链接字体</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">14px，Medium (500)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">Active 边框</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">#F59E0B（橙色），2px</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">用户头像</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">32px × 32px，圆形</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">下拉菜单阴影</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">0 4px 12px rgba(0,0,0,0.1)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px;">移动端断点</td>
+                    <td style="padding: 12px;">768px</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

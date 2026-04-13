@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>板块资金流向 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 20px 32px;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .controls-bar {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-range-tabs {
+            display: flex;
+            gap: 12px;
+        }
+
+        .time-tab {
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #FFFFFF;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-tab.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .time-tab:hover:not(.active) {
+            border-color: #1E3A8A;
+            color: #1E3A8A;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #FFFFFF;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .sector-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sector-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .sector-card:hover {
+            background-color: #F9FAFB;
+            border-color: #1E3A8A;
+        }
+
+        .sector-rank {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            width: 32px;
+            text-align: center;
+        }
+
+        .sector-name {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .sector-amount {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .sector-amount.inflow {
+            color: #EF4444;
+        }
+
+        .sector-amount.outflow {
+            color: #10B981;
+        }
+
+        .sector-change {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+
+        .sector-change.up {
+            color: #EF4444;
+        }
+
+        .sector-change.down {
+            color: #10B981;
+        }
+
+        .last-update {
+            font-size: 12px;
+            color: #9CA3AF;
+            text-align: right;
+            margin-top: 12px;
+        }
+
+        /* 响应式 - 移动端 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .controls-bar {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .time-range-tabs {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .time-tab {
+                flex: 1;
+                text-align: center;
+            }
+
+            .sector-card {
+                flex-wrap: wrap;
+            }
+
+            .sector-rank {
+                width: 24px;
+                font-size: 16px;
+            }
+
+            .sector-name {
+                font-size: 14px;
+            }
+
+            .sector-amount {
+                font-size: 14px;
+                min-width: 100px;
+            }
+
+            .sector-change {
+                font-size: 12px;
+                min-width: 70px;
+            }
+        }
+
+        /* 响应式 - 平板 */
+        @media (min-width: 769px) and (max-width: 1279px) {
+            .sector-amount {
+                font-size: 14px;
+            }
+
+            .sector-change {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 板块资金流向</h1>
+    </div>
+
+    <div class="container">
+        <div class="controls-bar">
+            <div class="time-range-tabs">
+                <button class="time-tab active">今日</button>
+                <button class="time-tab">近5日</button>
+                <button class="time-tab">近30日</button>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active">☰ 列表视图</button>
+                <button class="view-btn">● 气泡图视图</button>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <!-- 左栏：资金流入 TOP 10 -->
+            <div class="sector-section">
+                <h2 class="section-title">📈 资金流入 TOP 10</h2>
+
+                <div class="sector-card">
+                    <div class="sector-rank">1</div>
+                    <div class="sector-name">半导体</div>
+                    <div class="sector-amount inflow">+285.12 亿</div>
+                    <div class="sector-change up">
+                        <span>+4.23%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">2</div>
+                    <div class="sector-name">新能源</div>
+                    <div class="sector-amount inflow">+212.33 亿</div>
+                    <div class="sector-change up">
+                        <span>+3.15%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">3</div>
+                    <div class="sector-name">医药生物</div>
+                    <div class="sector-amount inflow">+178.45 亿</div>
+                    <div class="sector-change up">
+                        <span>+2.88%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">4</div>
+                    <div class="sector-name">人工智能</div>
+                    <div class="sector-amount inflow">+156.77 亿</div>
+                    <div class="sector-change up">
+                        <span>+3.92%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">5</div>
+                    <div class="sector-name">电子元件</div>
+                    <div class="sector-amount inflow">+134.21 亿</div>
+                    <div class="sector-change up">
+                        <span>+2.45%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">6</div>
+                    <div class="sector-name">计算机应用</div>
+                    <div class="sector-amount inflow">+112.88 亿</div>
+                    <div class="sector-change up">
+                        <span>+1.97%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">7</div>
+                    <div class="sector-name">通信设备</div>
+                    <div class="sector-amount inflow">+98.54 亿</div>
+                    <div class="sector-change up">
+                        <span>+2.12%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">8</div>
+                    <div class="sector-name">光伏设备</div>
+                    <div class="sector-amount inflow">+87.33 亿</div>
+                    <div class="sector-change up">
+                        <span>+1.76%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">9</div>
+                    <div class="sector-name">动力电池</div>
+                    <div class="sector-amount inflow">+75.92 亿</div>
+                    <div class="sector-change up">
+                        <span>+1.58%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">10</div>
+                    <div class="sector-name">储能</div>
+                    <div class="sector-amount inflow">+68.41 亿</div>
+                    <div class="sector-change up">
+                        <span>+1.32%</span>
+                        <span>↑</span>
+                    </div>
+                </div>
+
+                <div class="last-update">最后更新: 16:15</div>
+            </div>
+
+            <!-- 右栏：资金流出 TOP 10 -->
+            <div class="sector-section">
+                <h2 class="section-title">📉 资金流出 TOP 10</h2>
+
+                <div class="sector-card">
+                    <div class="sector-rank">1</div>
+                    <div class="sector-name">银行</div>
+                    <div class="sector-amount outflow">-85.45 亿</div>
+                    <div class="sector-change down">
+                        <span>-1.52%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">2</div>
+                    <div class="sector-name">房地产</div>
+                    <div class="sector-amount outflow">-72.18 亿</div>
+                    <div class="sector-change down">
+                        <span>-2.33%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">3</div>
+                    <div class="sector-name">煤炭</div>
+                    <div class="sector-amount outflow">-58.92 亿</div>
+                    <div class="sector-change down">
+                        <span>-1.87%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">4</div>
+                    <div class="sector-name">钢铁</div>
+                    <div class="sector-amount outflow">-45.27 亿</div>
+                    <div class="sector-change down">
+                        <span>-1.45%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">5</div>
+                    <div class="sector-name">建筑材料</div>
+                    <div class="sector-amount outflow">-38.14 亿</div>
+                    <div class="sector-change down">
+                        <span>-1.22%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">6</div>
+                    <div class="sector-name">化工</div>
+                    <div class="sector-amount outflow">-32.86 亿</div>
+                    <div class="sector-change down">
+                        <span>-0.98%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">7</div>
+                    <div class="sector-name">有色金属</div>
+                    <div class="sector-amount outflow">-28.55 亿</div>
+                    <div class="sector-change down">
+                        <span>-0.87%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">8</div>
+                    <div class="sector-name">汽车</div>
+                    <div class="sector-amount outflow">-21.77 亿</div>
+                    <div class="sector-change down">
+                        <span>-0.83%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">9</div>
+                    <div class="sector-name">保险</div>
+                    <div class="sector-amount outflow">-18.42 亿</div>
+                    <div class="sector-change down">
+                        <span>-0.65%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="sector-card">
+                    <div class="sector-rank">10</div>
+                    <div class="sector-name">航空</div>
+                    <div class="sector-amount outflow">-15.23 亿</div>
+                    <div class="sector-change down">
+                        <span>-0.52%</span>
+                        <span>↓</span>
+                    </div>
+                </div>
+
+                <div class="last-update">最后更新: 16:15</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

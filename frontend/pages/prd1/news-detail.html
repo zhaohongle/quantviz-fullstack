@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沪指大涨1.46%，半导体板块领涨 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.8;
+        }
+
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .breadcrumb {
+            background-color: #FFFFFF;
+            padding: 12px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .breadcrumb a {
+            color: #1E3A8A;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* 文章头部 */
+        .article-header {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .article-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .meta-icon {
+            font-size: 16px;
+        }
+
+        .article-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background-color: #DBEAFE;
+            color: #1E3A8A;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* 文章内容 */
+        .article-content {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .article-content h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #111827;
+            margin: 32px 0 16px 0;
+        }
+
+        .article-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .article-content p {
+            font-size: 16px;
+            color: #4B5563;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .article-content ul {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .article-content li {
+            font-size: 16px;
+            color: #4B5563;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box {
+            background-color: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }
+
+        .highlight-box p {
+            color: #92400E;
+            margin-bottom: 0;
+        }
+
+        /* 数据表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+        }
+
+        .data-table th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            font-size: 14px;
+        }
+
+        /* 相关资讯 */
+        .related-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .related-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .related-item:last-child {
+            border-bottom: none;
+        }
+
+        .related-item:hover {
+            background-color: #F9FAFB;
+        }
+
+        .related-number {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #9CA3AF;
+            min-width: 24px;
+        }
+
+        .related-content {
+            flex: 1;
+        }
+
+        .related-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .related-meta {
+            font-size: 13px;
+            color: #9CA3AF;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .breadcrumb {
+                padding: 8px 16px;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .article-header {
+                padding: 20px;
+            }
+
+            .article-title {
+                font-size: 22px;
+            }
+
+            .article-content {
+                padding: 20px;
+            }
+
+            .article-content h2 {
+                font-size: 18px;
+            }
+
+            .article-content p,
+            .article-content li {
+                font-size: 15px;
+            }
+
+            .data-table {
+                font-size: 13px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-link active">全球指数</a>
+            <a href="#" class="nav-link">板块资金流向</a>
+            <a href="#" class="nav-link">AI 精选推荐</a>
+            <a href="#" class="nav-link">自选股</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a> / <a href="#">实时资讯</a> / 文章详情
+    </div>
+
+    <div class="container">
+        <!-- 文章头部 -->
+        <article class="article-header">
+            <h1 class="article-title">沪指大涨1.46%，半导体板块领涨，科创板成交额创新高</h1>
+            
+            <div class="article-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">🕐</span>
+                    <span>2026-04-13 16:14</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📰</span>
+                    <span>新浪财经</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">👁</span>
+                    <span>12,345 阅读</span>
+                </div>
+            </div>
+
+            <div class="article-tags">
+                <span class="tag">#半导体</span>
+                <span class="tag">#科创板</span>
+                <span class="tag">#A股</span>
+                <span class="tag">#市场分析</span>
+            </div>
+        </article>
+
+        <!-- 文章内容 -->
+        <div class="article-content">
+            <p><strong>【摘要】</strong>2026年4月13日，A股三大指数集体收涨，沪指涨1.46%，深证成指涨1.70%，创业板指涨2.15%。半导体、新能源、医药生物等板块领涨，科创50指数暴涨3.33%，成交额创历史新高。北向资金净流入超80亿元，市场情绪明显回暖。</p>
+
+            <h2>市场概况</h2>
+            <p>今日A股市场延续强势，三大指数全线上涨。截至收盘，上证指数报3948.55点，涨1.46%；深证成指报13706.52点，涨1.70%；创业板指报2856.33点，涨2.15%。科创50指数表现最为亮眼，全天大涨3.33%，报1024.88点，成交额突破800亿元，创历史新高。</p>
+
+            <p>成交量方面，沪深两市今日成交额达到1.2万亿元，较前一交易日放量明显。其中，科创板成交额超过800亿元，占全市场成交额的比重持续提升，反映出市场对科技创新板块的关注度持续升温。</p>
+
+            <h2>板块表现</h2>
+            <p>板块方面，半导体、新能源、医药生物、人工智能等科技成长板块领涨。具体来看：</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>板块名称</th>
+                        <th>涨跌幅</th>
+                        <th>资金流向</th>
+                        <th>领涨股</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>半导体</td>
+                        <td style="color: #EF4444;">+4.23%</td>
+                        <td style="color: #EF4444;">+285.12 亿</td>
+                        <td>北方华创、中芯国际</td>
+                    </tr>
+                    <tr>
+                        <td>新能源</td>
+                        <td style="color: #EF4444;">+3.15%</td>
+                        <td style="color: #EF4444;">+212.33 亿</td>
+                        <td>宁德时代、比亚迪</td>
+                    </tr>
+                    <tr>
+                        <td>医药生物</td>
+                        <td style="color: #EF4444;">+2.88%</td>
+                        <td style="color: #EF4444;">+178.45 亿</td>
+                        <td>药明康德、恒瑞医药</td>
+                    </tr>
+                    <tr>
+                        <td>人工智能</td>
+                        <td style="color: #EF4444;">+3.92%</td>
+                        <td style="color: #EF4444;">+156.77 亿</td>
+                        <td>海康威视、科大讯飞</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>传统周期板块则表现疲软，银行、房地产、煤炭等板块跌幅居前，资金明显流出。</p>
+
+            <h2>个股亮点</h2>
+            <p><strong>北方华创</strong>今日涨停，收于312.45元，成交额超过128亿元。公司作为国产半导体设备龙头，受益于国产替代加速和订单快速增长，机构持续看好其长期发展前景。</p>
+
+            <p><strong>药明康德</strong>盘中创历史新高，收涨5.82%至103.81元。公司2026Q1业绩预告超预期，CRO行业景气度持续上行，订单饱满，业绩增长确定性强。</p>
+
+            <p><strong>宁德时代</strong>午后快速拉升，收涨2.15%，成交额超过150亿元。公司发布新一代固态电池技术，能量密度提升30%，引发市场强烈关注。</p>
+
+            <div class="highlight-box">
+                <p><strong>💡 机构观点：</strong>多家券商认为，当前市场已进入技术性反弹阶段，科技成长板块有望成为本轮行情的主线。建议关注半导体、新能源、人工智能等高景气度板块的龙头标的。</p>
+            </div>
+
+            <h2>资金流向</h2>
+            <p>资金面上，北向资金今日净流入82.5亿元，连续5个交易日净流入，累计净流入超过300亿元。其中，沪股通净流入48.2亿元，深股通净流入34.3亿元。</p>
+
+            <p>主力资金方面，半导体板块净流入285亿元居首，新能源板块净流入212亿元位列第二。个股层面，北方华创净流入35.2亿元，中芯国际净流入28.5亿元，宁德时代净流入32.8亿元。</p>
+
+            <h2>市场展望</h2>
+            <p>分析人士指出，本轮反弹的核心驱动因素包括：</p>
+
+            <ul>
+                <li><strong>政策面：</strong>中央经济工作会议明确稳增长基调，政策支持力度加大</li>
+                <li><strong>基本面：</strong>一季度经济数据超预期，企业盈利改善明显</li>
+                <li><strong>资金面：</strong>北向资金持续流入，市场流动性充裕</li>
+                <li><strong>技术面：</strong>沪指突破3900点关口，多头排列形成</li>
+            </ul>
+
+            <p>不过，也有机构提醒，当前市场估值已处于合理偏高区间，短期需警惕获利回吐压力。建议投资者保持谨慎乐观态度，关注政策变化和业绩兑现情况，避免追高。</p>
+
+            <div class="highlight-box">
+                <p><strong>⚠️ 风险提示：</strong>市场存在不确定性，投资需谨慎。本文内容仅供参考，不构成投资建议。</p>
+            </div>
+        </div>
+
+        <!-- 相关资讯 -->
+        <div class="related-section">
+            <div class="section-title">📰 相关资讯推荐</div>
+
+            <div class="related-item">
+                <div class="related-number">1</div>
+                <div class="related-content">
+                    <div class="related-title">北方华创盘中创新高，成交额超15亿元，机构买入明显</div>
+                    <div class="related-meta">15:30 · 东方财富 · 8,234 阅读</div>
+                </div>
+            </div>
+
+            <div class="related-item">
+                <div class="related-number">2</div>
+                <div class="related-content">
+                    <div class="related-title">科创50暴涨3.33%，科创板成交额创历史新高</div>
+                    <div class="related-meta">14:45 · 新浪财经 · 6,789 阅读</div>
+                </div>
+            </div>
+
+            <div class="related-item">
+                <div class="related-number">3</div>
+                <div class="related-content">
+                    <div class="related-title">宁德时代发布新一代固态电池，能量密度提升30%</div>
+                    <div class="related-meta">13:20 · 华尔街见闻 · 5,432 阅读</div>
+                </div>
+            </div>
+
+            <div class="related-item">
+                <div class="related-number">4</div>
+                <div class="related-content">
+                    <div class="related-title">中央经济工作会议定调2026年政策，稳增长信号明确</div>
+                    <div class="related-meta">12:30 · 东方财富 · 4,567 阅读</div>
+                </div>
+            </div>
+
+            <div class="related-item">
+                <div class="related-number">5</div>
+                <div class="related-content">
+                    <div class="related-title">北向资金连续5日净流入，累计超300亿元</div>
+                    <div class="related-meta">11:45 · 新浪财经 · 3,891 阅读</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

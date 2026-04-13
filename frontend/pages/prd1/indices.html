@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球指数 + 实时资讯 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 20px 32px;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 24px;
+        }
+
+        /* 左栏 - 全球指数 */
+        .indices-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .market-group {
+            margin-bottom: 24px;
+        }
+
+        .market-group-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4B5563;
+            margin-bottom: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .index-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .index-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: #1E3A8A;
+        }
+
+        .index-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .index-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .index-code {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .index-price {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .index-change {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .index-change.up {
+            color: #EF4444;
+        }
+
+        .index-change.down {
+            color: #10B981;
+        }
+
+        .index-change.flat {
+            color: #6B7280;
+        }
+
+        .btn-detail {
+            background-color: #F59E0B;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-detail:hover {
+            background-color: #FCD34D;
+        }
+
+        /* 右栏 - 实时资讯 */
+        .news-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .news-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .btn-refresh {
+            background-color: transparent;
+            color: #1E3A8A;
+            border: 1px solid #1E3A8A;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background-color: #DBEAFE;
+        }
+
+        .last-update {
+            font-size: 12px;
+            color: #9CA3AF;
+            text-align: right;
+            margin-bottom: 12px;
+        }
+
+        .news-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .news-card:hover {
+            background-color: #F9FAFB;
+        }
+
+        .news-meta {
+            font-size: 12px;
+            color: #9CA3AF;
+            margin-bottom: 8px;
+        }
+
+        .news-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .news-summary {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .news-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background-color: #DBEAFE;
+            color: #1E3A8A;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        /* 响应式 - 移动端 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        /* 响应式 - 平板 */
+        @media (min-width: 769px) and (max-width: 1279px) {
+            .main-layout {
+                grid-template-columns: 45% 55%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌍 全球指数 + 实时资讯</h1>
+    </div>
+
+    <div class="container">
+        <div class="main-layout">
+            <!-- 左栏：全球指数 -->
+            <div class="indices-section">
+                <h2 class="section-title">🌍 全球指数</h2>
+
+                <!-- A股市场 -->
+                <div class="market-group">
+                    <div class="market-group-title">📊 A 股市场</div>
+                    
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">上证指数</div>
+                                <div class="index-code">000001.SH</div>
+                            </div>
+                        </div>
+                        <div class="index-price">3,948.55</div>
+                        <div class="index-change up">
+                            <span>+1.46%</span>
+                            <span>↑</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">深证成指</div>
+                                <div class="index-code">399001.SZ</div>
+                            </div>
+                        </div>
+                        <div class="index-price">13,706.52</div>
+                        <div class="index-change up">
+                            <span>+1.70%</span>
+                            <span>↑</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">创业板指</div>
+                                <div class="index-code">399006.SZ</div>
+                            </div>
+                        </div>
+                        <div class="index-price">2,856.33</div>
+                        <div class="index-change up">
+                            <span>+2.15%</span>
+                            <span>↑</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">科创 50</div>
+                                <div class="index-code">000688.SH</div>
+                            </div>
+                        </div>
+                        <div class="index-price">1,024.88</div>
+                        <div class="index-change up">
+                            <span>+3.33%</span>
+                            <span>↑</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+                </div>
+
+                <!-- 美股市场 -->
+                <div class="market-group">
+                    <div class="market-group-title">🇺🇸 美股市场</div>
+                    
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">纳斯达克</div>
+                                <div class="index-code">^IXIC</div>
+                            </div>
+                        </div>
+                        <div class="index-price">14,231.77</div>
+                        <div class="index-change down">
+                            <span>-0.44%</span>
+                            <span>↓</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">标普 500</div>
+                                <div class="index-code">^GSPC</div>
+                            </div>
+                        </div>
+                        <div class="index-price">4,587.18</div>
+                        <div class="index-change down">
+                            <span>-0.28%</span>
+                            <span>↓</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <div>
+                                <div class="index-name">道琼斯</div>
+                                <div class="index-code">^DJI</div>
+                            </div>
+                        </div>
+                        <div class="index-price">35,677.02</div>
+                        <div class="index-change down">
+                            <span>-0.15%</span>
+                            <span>↓</span>
+                        </div>
+                        <button class="btn-detail">查看详情</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右栏：实时资讯 -->
+            <div class="news-section">
+                <h2 class="section-title">📰 实时资讯</h2>
+
+                <div class="news-controls">
+                    <div class="filter-group">
+                        <select class="filter-select">
+                            <option>全部来源</option>
+                            <option>新浪财经</option>
+                            <option>东方财富</option>
+                            <option>华尔街见闻</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>全部类型</option>
+                            <option>宏观</option>
+                            <option>行业</option>
+                            <option>个股</option>
+                            <option>政策</option>
+                        </select>
+                    </div>
+                    <button class="btn-refresh">⟳ 刷新</button>
+                </div>
+
+                <div class="last-update">最后更新: 16:15</div>
+
+                <div class="news-card">
+                    <div class="news-meta">16:14 · 新浪财经</div>
+                    <div class="news-title">沪指大涨1.46%，半导体板块领涨，科创板成交额创新高</div>
+                    <div class="news-summary">科创50暴涨3.33%，市场情绪高涨，北向资金净流入超80亿元...</div>
+                    <div class="news-tags">
+                        <span class="tag">#半导体</span>
+                        <span class="tag">#科创板</span>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-meta">15:30 · 东方财富</div>
+                    <div class="news-title">北方华创盘中创新高，成交额超15亿元，机构买入明显</div>
+                    <div class="news-summary">公司订单饱满，业绩增长确定性强，多家机构给予买入评级...</div>
+                    <div class="news-tags">
+                        <span class="tag">#芯片</span>
+                        <span class="tag">#科创50</span>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-meta">15:00 · 华尔街见闻</div>
+                    <div class="news-title">美联储官员暗示今年或加息两次，科技股承压</div>
+                    <div class="news-summary">纳斯达克指数小幅下跌，投资者关注美联储政策走向...</div>
+                    <div class="news-tags">
+                        <span class="tag">#美股</span>
+                        <span class="tag">#美联储</span>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-meta">14:20 · 新浪财经</div>
+                    <div class="news-title">新能源汽车板块午后拉升，宁德时代涨超5%</div>
+                    <div class="news-summary">行业景气度持续上行，电池技术突破带动板块情绪...</div>
+                    <div class="news-tags">
+                        <span class="tag">#新能源</span>
+                        <span class="tag">#汽车</span>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-meta">13:45 · 东方财富</div>
+                    <div class="news-title">中央经济工作会议定调2026年政策，稳增长信号明确</div>
+                    <div class="news-summary">政策支持力度加大，市场预期改善，利好权重板块...</div>
+                    <div class="news-tags">
+                        <span class="tag">#宏观</span>
+                        <span class="tag">#政策</span>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-meta">12:30 · 华尔街见闻</div>
+                    <div class="news-title">比特币突破40000美元，加密货币市场全线上涨</div>
+                    <div class="news-summary">机构资金持续流入，市场风险偏好提升...</div>
+                    <div class="news-tags">
+                        <span class="tag">#加密货币</span>
+                        <span class="tag">#比特币</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== API 配置 ==========
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // ========== Mock 数据（降级使用） ==========
+        const mockIndices = [
+            { name: '上证指数', code: '000001', price: 3241.28, change: 1.46, changePercent: 1.46 },
+            { name: '深证成指', code: '399001', price: 11240.56, change: 2.12, changePercent: 2.12 },
+            { name: '科创50', code: '000688', price: 1045.32, change: 3.33, changePercent: 3.33 },
+            { name: '纳斯达克', code: '^IXIC', price: 14231.77, change: -0.44, changePercent: -0.44 },
+            { name: '标普 500', code: '^GSPC', price: 4587.18, change: -0.28, changePercent: -0.28 },
+            { name: '道琼斯', code: '^DJI', price: 35677.02, change: -0.15, changePercent: -0.15 }
+        ];
+        
+        const mockNews = [
+            {
+                time: '16:14',
+                source: '新浪财经',
+                title: '沪指大涨1.46%，半导体板块领涨，科创板成交额创新高',
+                summary: '科创50暴涨3.33%，市场情绪高涨，北向资金净流入超80亿元...',
+                tags: ['半导体', '科创板']
+            }
+        ];
+
+        // ========== API 请求函数 ==========
+        async function fetchIndices() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/indices`);
+                if (!response.ok) throw new Error('API请求失败');
+                const result = await response.json();
+                return result.data || mockIndices;
+            } catch (error) {
+                console.error('获取指数数据失败:', error);
+                return mockIndices;
+            }
+        }
+
+        async function fetchNews() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/news`);
+                if (!response.ok) throw new Error('API请求失败');
+                const result = await response.json();
+                return result.data || mockNews;
+            } catch (error) {
+                console.error('获取新闻数据失败:', error);
+                return mockNews;
+            }
+        }
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', async () => {
+            const [indices, news] = await Promise.all([fetchIndices(), fetchNews()]);
+            console.log('✅ 数据加载完成');
+        });
+    </script>
+</body>
+</html>

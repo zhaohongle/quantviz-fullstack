@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史推荐记录 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+        }
+
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb {
+            background-color: #FFFFFF;
+            padding: 12px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .breadcrumb a {
+            color: #1E3A8A;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .filter-bar {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .recommendation-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .recommendation-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .card-code {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+
+        .card-date {
+            font-size: 13px;
+            color: #9CA3AF;
+        }
+
+        .card-rating {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .card-prices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .price-item {
+            background-color: #F9FAFB;
+            border-radius: 4px;
+            padding: 8px;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 4px;
+        }
+
+        .price-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .return-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .return-value.positive {
+            color: #EF4444;
+        }
+
+        .return-value.negative {
+            color: #10B981;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-badge.failed {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status-badge.pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 32px;
+        }
+
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            background-color: #FFFFFF;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .page-btn:hover:not(.active) {
+            background-color: #F9FAFB;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-link">全球指数</a>
+            <a href="#" class="nav-link">板块资金流向</a>
+            <a href="#" class="nav-link active">AI 精选推荐</a>
+            <a href="#" class="nav-link">自选股</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a> / <a href="#">AI 精选推荐</a> / 历史推荐记录
+    </div>
+
+    <div class="container">
+        <div class="filter-bar">
+            <div class="filter-group">
+                <select class="filter-select">
+                    <option>全部状态</option>
+                    <option>✅ 达标</option>
+                    <option>❌ 未达标</option>
+                    <option>⏳ 进行中</option>
+                </select>
+                <select class="filter-select">
+                    <option>全部等级</option>
+                    <option>⭐⭐⭐ 强烈推荐</option>
+                    <option>⭐⭐ 推荐</option>
+                    <option>⭐ 关注</option>
+                </select>
+                <select class="filter-select">
+                    <option>全部时间</option>
+                    <option>近7日</option>
+                    <option>近30日</option>
+                    <option>近90日</option>
+                </select>
+                <select class="filter-select">
+                    <option>按日期排序</option>
+                    <option>按收益排序</option>
+                    <option>按等级排序</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索股票名称或代码">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <!-- 推荐卡片 1 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">药明康德</div>
+                        <div class="card-code">603259</div>
+                    </div>
+                    <div class="card-date">2026-04-10</div>
+                </div>
+                <div class="card-rating">⭐⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥100</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥115</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥95</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+12.5%</div>
+                    <div class="status-badge success">✅ 达标</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 2 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">北方华创</div>
+                        <div class="card-code">002371</div>
+                    </div>
+                    <div class="card-date">2026-04-09</div>
+                </div>
+                <div class="card-rating">⭐⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥310</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥350</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥290</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+8.3%</div>
+                    <div class="status-badge pending">⏳ 进行中</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 3 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">宁德时代</div>
+                        <div class="card-code">300750</div>
+                    </div>
+                    <div class="card-date">2026-04-08</div>
+                </div>
+                <div class="card-rating">⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥180</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥200</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥170</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value negative">-3.2%</div>
+                    <div class="status-badge failed">❌ 未达标</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 4 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">海康威视</div>
+                        <div class="card-code">002415</div>
+                    </div>
+                    <div class="card-date">2026-04-07</div>
+                </div>
+                <div class="card-rating">⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥37</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥42</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥35</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+5.4%</div>
+                    <div class="status-badge pending">⏳ 进行中</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 5 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">隆基绿能</div>
+                        <div class="card-code">601012</div>
+                    </div>
+                    <div class="card-date">2026-04-06</div>
+                </div>
+                <div class="card-rating">⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥21</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥25</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥20</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value negative">-4.8%</div>
+                    <div class="status-badge failed">❌ 未达标</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 6 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">中芯国际</div>
+                        <div class="card-code">688981</div>
+                    </div>
+                    <div class="card-date">2026-04-05</div>
+                </div>
+                <div class="card-rating">⭐⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥54</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥62</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥50</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+15.2%</div>
+                    <div class="status-badge success">✅ 达标</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 7 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">韦尔股份</div>
+                        <div class="card-code">603501</div>
+                    </div>
+                    <div class="card-date">2026-04-04</div>
+                </div>
+                <div class="card-rating">⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥105</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥120</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥98</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+7.6%</div>
+                    <div class="status-badge pending">⏳ 进行中</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 8 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">长电科技</div>
+                        <div class="card-code">600584</div>
+                    </div>
+                    <div class="card-date">2026-04-03</div>
+                </div>
+                <div class="card-rating">⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥27</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥30</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥25</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+11.1%</div>
+                    <div class="status-badge success">✅ 达标</div>
+                </div>
+            </div>
+
+            <!-- 推荐卡片 9 -->
+            <div class="recommendation-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">兆易创新</div>
+                        <div class="card-code">603986</div>
+                    </div>
+                    <div class="card-date">2026-04-02</div>
+                </div>
+                <div class="card-rating">⭐⭐⭐</div>
+                <div class="card-prices">
+                    <div class="price-item">
+                        <div class="price-label">买入价</div>
+                        <div class="price-value">¥92</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">目标价</div>
+                        <div class="price-value">¥108</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">止损价</div>
+                        <div class="price-value">¥88</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="return-value positive">+18.5%</div>
+                    <div class="status-badge success">✅ 达标</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn">← 上一页</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">下一页 →</button>
+        </div>
+    </div>
+</body>
+</html>

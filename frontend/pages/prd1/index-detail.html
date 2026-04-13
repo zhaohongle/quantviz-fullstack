@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上证指数详情 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .nav-link.active {
+            border-bottom: 2px solid #F59E0B;
+            padding-bottom: 4px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            background-color: #FFFFFF;
+            padding: 12px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .breadcrumb a {
+            color: #1E3A8A;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* 指数头部 */
+        .index-header {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .index-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .index-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .index-code {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+
+        .btn-watchlist {
+            background-color: #F59E0B;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-watchlist:hover {
+            background-color: #FCD34D;
+        }
+
+        .index-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .stat-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .stat-value.up {
+            color: #EF4444;
+        }
+
+        .stat-value.down {
+            color: #10B981;
+        }
+
+        /* K线图区域 */
+        .chart-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-btn {
+            padding: 6px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: #FFFFFF;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chart-btn.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .chart-btn:hover:not(.active) {
+            border-color: #1E3A8A;
+            color: #1E3A8A;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(to bottom, #F9FAFB 0%, #FFFFFF 100%);
+            border: 1px dashed #E5E7EB;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        /* 技术指标 */
+        .indicators-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .indicator-card {
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            padding: 16px;
+        }
+
+        .indicator-name {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+
+        .indicator-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .indicator-signal {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .indicator-signal.buy {
+            color: #EF4444;
+        }
+
+        .indicator-signal.sell {
+            color: #10B981;
+        }
+
+        .indicator-signal.neutral {
+            color: #6B7280;
+        }
+
+        /* 历史数据表格 */
+        .history-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 2px solid #E5E7EB;
+            font-size: 14px;
+            color: #111827;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #F9FAFB;
+        }
+
+        .table-number {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .breadcrumb {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .index-header {
+                padding: 16px;
+            }
+
+            .index-title-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .index-title {
+                font-size: 20px;
+            }
+
+            .index-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-section {
+                padding: 16px;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .chart-placeholder {
+                height: 300px;
+            }
+
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-brand">量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-link active">全球指数</a>
+            <a href="#" class="nav-link">板块资金流向</a>
+            <a href="#" class="nav-link">AI 精选推荐</a>
+            <a href="#" class="nav-link">自选股</a>
+        </div>
+    </nav>
+
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+        <a href="#">首页</a> / <a href="#">全球指数</a> / 上证指数
+    </div>
+
+    <div class="container">
+        <!-- 指数头部 -->
+        <div class="index-header">
+            <div class="index-title-row">
+                <div>
+                    <div class="index-title">上证指数</div>
+                    <div class="index-code">000001.SH · 上海证券交易所</div>
+                </div>
+                <button class="btn-watchlist">⭐ 加入自选</button>
+            </div>
+
+            <div class="index-stats">
+                <div class="stat-item">
+                    <div class="stat-label">最新价</div>
+                    <div class="stat-value">3,948.55</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">涨跌额</div>
+                    <div class="stat-value up">+57.23</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">涨跌幅</div>
+                    <div class="stat-value up">+1.46% ↑</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">今开</div>
+                    <div class="stat-value">3,891.32</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">昨收</div>
+                    <div class="stat-value">3,891.32</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最高</div>
+                    <div class="stat-value">3,955.18</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最低</div>
+                    <div class="stat-value">3,885.42</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">成交量</div>
+                    <div class="stat-value">328.5 亿股</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">成交额</div>
+                    <div class="stat-value">4,237 亿元</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- K线图 -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div class="chart-title">📈 K 线图</div>
+                <div class="chart-controls">
+                    <button class="chart-btn">分时</button>
+                    <button class="chart-btn active">日K</button>
+                    <button class="chart-btn">周K</button>
+                    <button class="chart-btn">月K</button>
+                    <button class="chart-btn">5分钟</button>
+                    <button class="chart-btn">15分钟</button>
+                    <button class="chart-btn">30分钟</button>
+                    <button class="chart-btn">60分钟</button>
+                </div>
+            </div>
+            <div class="chart-placeholder">
+                📊 K 线图区域（建议使用 ECharts / TradingView 集成）
+            </div>
+        </div>
+
+        <!-- 技术指标 -->
+        <div class="indicators-section">
+            <div class="section-title">📊 技术指标</div>
+            <div class="indicators-grid">
+                <div class="indicator-card">
+                    <div class="indicator-name">MACD</div>
+                    <div class="indicator-value">DIF: 12.35</div>
+                    <div class="indicator-signal buy">金叉 ↑ 买入信号</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">KDJ</div>
+                    <div class="indicator-value">K: 65.2, D: 58.3</div>
+                    <div class="indicator-signal buy">金叉 ↑ 买入信号</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">RSI (14)</div>
+                    <div class="indicator-value">62.5</div>
+                    <div class="indicator-signal neutral">中性</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">BOLL</div>
+                    <div class="indicator-value">上轨: 4,012</div>
+                    <div class="indicator-signal neutral">中轨运行</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">MA5</div>
+                    <div class="indicator-value">3,925.45</div>
+                    <div class="indicator-signal buy">价格 > MA5</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">MA10</div>
+                    <div class="indicator-value">3,908.72</div>
+                    <div class="indicator-signal buy">价格 > MA10</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">MA20</div>
+                    <div class="indicator-value">3,882.38</div>
+                    <div class="indicator-signal buy">价格 > MA20</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-name">成交量 MA5</div>
+                    <div class="indicator-value">315.2 亿股</div>
+                    <div class="indicator-signal buy">量能放大</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史数据 -->
+        <div class="history-section">
+            <div class="section-title">📋 历史数据</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>收盘价</th>
+                            <th>涨跌额</th>
+                            <th>涨跌幅</th>
+                            <th>开盘价</th>
+                            <th>最高价</th>
+                            <th>最低价</th>
+                            <th>成交量 (亿股)</th>
+                            <th>成交额 (亿元)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-04-13</td>
+                            <td class="table-number">3,948.55</td>
+                            <td class="table-number" style="color: #EF4444;">+57.23</td>
+                            <td class="table-number" style="color: #EF4444;">+1.46%</td>
+                            <td class="table-number">3,891.32</td>
+                            <td class="table-number">3,955.18</td>
+                            <td class="table-number">3,885.42</td>
+                            <td class="table-number">328.5</td>
+                            <td class="table-number">4,237</td>
+                        </tr>
+                        <tr>
+                            <td>2026-04-12</td>
+                            <td class="table-number">3,891.32</td>
+                            <td class="table-number" style="color: #10B981;">-32.15</td>
+                            <td class="table-number" style="color: #10B981;">-0.82%</td>
+                            <td class="table-number">3,920.45</td>
+                            <td class="table-number">3,925.88</td>
+                            <td class="table-number">3,878.22</td>
+                            <td class="table-number">305.2</td>
+                            <td class="table-number">3,987</td>
+                        </tr>
+                        <tr>
+                            <td>2026-04-11</td>
+                            <td class="table-number">3,923.47</td>
+                            <td class="table-number" style="color: #EF4444;">+45.88</td>
+                            <td class="table-number" style="color: #EF4444;">+1.18%</td>
+                            <td class="table-number">3,877.59</td>
+                            <td class="table-number">3,932.12</td>
+                            <td class="table-number">3,875.33</td>
+                            <td class="table-number">312.8</td>
+                            <td class="table-number">4,102</td>
+                        </tr>
+                        <tr>
+                            <td>2026-04-10</td>
+                            <td class="table-number">3,877.59</td>
+                            <td class="table-number" style="color: #10B981;">-18.42</td>
+                            <td class="table-number" style="color: #10B981;">-0.47%</td>
+                            <td class="table-number">3,895.01</td>
+                            <td class="table-number">3,902.33</td>
+                            <td class="table-number">3,865.77</td>
+                            <td class="table-number">298.5</td>
+                            <td class="table-number">3,856</td>
+                        </tr>
+                        <tr>
+                            <td>2026-04-09</td>
+                            <td class="table-number">3,896.01</td>
+                            <td class="table-number" style="color: #EF4444;">+28.55</td>
+                            <td class="table-number" style="color: #EF4444;">+0.74%</td>
+                            <td class="table-number">3,867.46</td>
+                            <td class="table-number">3,908.88</td>
+                            <td class="table-number">3,862.12</td>
+                            <td class="table-number">285.3</td>
+                            <td class="table-number">3,722</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

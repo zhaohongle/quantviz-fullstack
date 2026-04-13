@@ -1,0 +1,231 @@
+/* ========== QuantViz Design System CSS ========== */
+/* 统一的设计系统样式，所有页面共享 */
+
+/* ========== CSS Reset ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========== Base Styles ========== */
+body {
+    font-family: 'Source Han Sans CN', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #F9FAFB;
+    color: #111827;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ========== Layout ========== */
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.main-layout {
+    display: grid;
+    gap: 24px;
+}
+
+.main-layout.two-column {
+    grid-template-columns: 40% 60%;
+}
+
+.main-layout.three-column {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ========== Navigation ========== */
+.header {
+    background-color: #1E3A8A;
+    color: #FFFFFF;
+    padding: 20px 32px;
+    margin-bottom: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 24px;
+    margin-top: 12px;
+}
+
+.nav-link {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+    background-color: #F59E0B;
+}
+
+/* ========== Cards ========== */
+.section-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ========== Buttons ========== */
+.btn {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: #1E3A8A;
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: #1E40AF;
+}
+
+.btn-secondary {
+    background-color: #F59E0B;
+    color: #FFFFFF;
+}
+
+.btn-secondary:hover {
+    background-color: #FCD34D;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #1E3A8A;
+    border: 1px solid #1E3A8A;
+}
+
+.btn-outline:hover {
+    background-color: #DBEAFE;
+}
+
+/* ========== Data Display ========== */
+.price {
+    font-family: 'DIN', 'Roboto Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.change {
+    font-family: 'DIN', 'Roboto Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.change.up {
+    color: #EF4444;
+}
+
+.change.down {
+    color: #10B981;
+}
+
+.change.flat {
+    color: #6B7280;
+}
+
+/* ========== Tags ========== */
+.tag {
+    display: inline-block;
+    background-color: #DBEAFE;
+    color: #1E3A8A;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+/* ========== Loading & Error States ========== */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #9CA3AF;
+    font-size: 16px;
+}
+
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #EF4444;
+    font-size: 16px;
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 1024px) {
+    .main-layout.two-column,
+    .main-layout.three-column {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 20px;
+    }
+    
+    .nav-menu {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .nav-link {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+/* ========== Utility Classes ========== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: #9CA3AF; }
+.text-small { font-size: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-12 { gap: 12px; }
+
+console.log('✅ Design System CSS loaded');

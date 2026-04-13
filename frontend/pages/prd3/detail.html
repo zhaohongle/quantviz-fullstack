@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药明康德 - AI 推荐详情 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .breadcrumb {
+            background-color: #FFFFFF;
+            padding: 12px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .breadcrumb a {
+            color: #1E3A8A;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* 推荐头部 */
+        .recommendation-header {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .stock-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .stock-code {
+            font-size: 16px;
+            color: #9CA3AF;
+        }
+
+        .stock-industry {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .rating-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rating-stars {
+            color: #F59E0B;
+            font-size: 20px;
+        }
+
+        .rating-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #F59E0B;
+        }
+
+        .recommendation-date {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .current-price {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .price-change {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: #EF4444;
+        }
+
+        .price-indicators {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+
+        .price-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .price-label {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .price-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .price-value.buy {
+            color: #1E3A8A;
+        }
+
+        .price-value.target {
+            color: #EF4444;
+        }
+
+        .price-value.stop {
+            color: #10B981;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background-color: #F59E0B;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background-color: #FFFFFF;
+            color: #1E3A8A;
+            border: 1px solid #1E3A8A;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* 多维度评分 */
+        .scores-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            margin-bottom: 20px;
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .score-name {
+            font-size: 14px;
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .score-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1E3A8A;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background-color: #F59E0B;
+            transition: width 0.3s;
+        }
+
+        /* 分析内容 */
+        .analysis-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-block {
+            margin-bottom: 24px;
+        }
+
+        .analysis-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .block-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .block-content {
+            font-size: 14px;
+            color: #4B5563;
+            line-height: 1.8;
+        }
+
+        .block-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .block-list li {
+            padding-left: 20px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .block-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #F59E0B;
+            font-weight: 700;
+        }
+
+        /* 风险提示 */
+        .risk-section {
+            background-color: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .risk-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #92400E;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .risk-content {
+            font-size: 14px;
+            color: #92400E;
+            line-height: 1.8;
+        }
+
+        /* K线图 */
+        .chart-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(to bottom, #F9FAFB 0%, #FFFFFF 100%);
+            border: 1px dashed #E5E7EB;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .recommendation-header {
+                padding: 16px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .stock-name {
+                font-size: 20px;
+            }
+
+            .current-price {
+                font-size: 24px;
+            }
+
+            .price-indicators {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-link">全球指数</a>
+            <a href="#" class="nav-link">板块资金流向</a>
+            <a href="#" class="nav-link active">AI 精选推荐</a>
+            <a href="#" class="nav-link">自选股</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a> / <a href="#">AI 精选推荐</a> / 药明康德
+    </div>
+
+    <div class="container">
+        <!-- 推荐头部 -->
+        <div class="recommendation-header">
+            <div class="header-top">
+                <div>
+                    <div class="stock-info">
+                        <span class="stock-name">药明康德</span>
+                        <span class="stock-code">(603259)</span>
+                        <span class="stock-industry">· 医药</span>
+                    </div>
+                </div>
+                <div class="rating-box">
+                    <div class="rating">
+                        <span class="rating-stars">⭐⭐⭐</span>
+                        <span class="rating-label">强烈推荐</span>
+                    </div>
+                    <div class="recommendation-date">推荐日期: 2026-04-13 09:30</div>
+                </div>
+            </div>
+
+            <div class="price-row">
+                <span class="current-price">当前价: ¥103.81</span>
+                <span class="price-change">+5.82% ↑</span>
+            </div>
+
+            <div class="price-indicators">
+                <div class="price-item">
+                    <span class="price-label">买入价区间</span>
+                    <span class="price-value buy">¥100 - ¥102</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-label">目标价</span>
+                    <span class="price-value target">¥115</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-label">止损价</span>
+                    <span class="price-value stop">¥95</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-label">预期收益</span>
+                    <span class="price-value target">+10.8%</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary">加入自选</button>
+                <button class="btn-secondary">查看实时行情</button>
+            </div>
+        </div>
+
+        <!-- 多维度评分 -->
+        <div class="scores-section">
+            <div class="section-title">📊 多维度评分</div>
+
+            <div class="score-item">
+                <div class="score-header">
+                    <span class="score-name">基本面（业绩、估值、成长性）</span>
+                    <span class="score-value">85 / 100</span>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <div class="score-item">
+                <div class="score-header">
+                    <span class="score-name">技术面（趋势、指标、量能）</span>
+                    <span class="score-value">78 / 100</span>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 78%;"></div>
+                </div>
+            </div>
+
+            <div class="score-item">
+                <div class="score-header">
+                    <span class="score-name">资金面（主力资金、北向资金）</span>
+                    <span class="score-value">82 / 100</span>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 82%;"></div>
+                </div>
+            </div>
+
+            <div class="score-item">
+                <div class="score-header">
+                    <span class="score-name">情绪面（新闻情绪、市场热度）</span>
+                    <span class="score-value">88 / 100</span>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 88%;"></div>
+                </div>
+            </div>
+
+            <div class="score-item">
+                <div class="score-header">
+                    <span class="score-name">行业面（景气度、政策支持）</span>
+                    <span class="score-value">90 / 100</span>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: 90%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推荐理由 -->
+        <div class="analysis-section">
+            <div class="section-title">📝 完整分析报告</div>
+
+            <div class="analysis-block">
+                <div class="block-title">🎯 核心推荐理由</div>
+                <div class="block-content">
+                    CRO（医药研发外包）行业景气度持续上行，公司作为全球领先的CRO企业，订单饱满，业绩增长确定性强。2026Q1业绩预告显示净利润同比增长35-40%，超市场预期。多家机构给予买入评级，目标价上调至115元。
+                </div>
+            </div>
+
+            <div class="analysis-block">
+                <div class="block-title">💼 基本面分析</div>
+                <ul class="block-list">
+                    <li><strong>业绩增长：</strong>2026Q1净利润同比增长35-40%，超市场预期</li>
+                    <li><strong>估值水平：</strong>当前PE(TTM) 28倍，处于历史估值中位数，合理区间</li>
+                    <li><strong>盈利能力：</strong>ROE 18.5%，行业领先水平</li>
+                    <li><strong>订单情况：</strong>在手订单超300亿美元，覆盖未来2-3年业绩</li>
+                    <li><strong>扩产计划：</strong>苏州新基地2026下半年投产，产能扩张50%</li>
+                </ul>
+            </div>
+
+            <div class="analysis-block">
+                <div class="block-title">📈 技术面分析</div>
+                <ul class="block-list">
+                    <li><strong>趋势判断：</strong>多头排列，价格位于MA5/MA10/MA20上方</li>
+                    <li><strong>MACD：</strong>DIF 12.35，金叉形态，买入信号</li>
+                    <li><strong>KDJ：</strong>K值 65.2，金叉形态，短期向上</li>
+                    <li><strong>成交量：</strong>近5日成交量放大，资金持续流入</li>
+                    <li><strong>支撑位：</strong>100元（MA20 + 前期平台）</li>
+                </ul>
+            </div>
+
+            <div class="analysis-block">
+                <div class="block-title">💰 资金面分析</div>
+                <ul class="block-list">
+                    <li><strong>主力资金：</strong>近5日主力净流入35.2亿元，持续买入</li>
+                    <li><strong>北向资金：</strong>近10日净买入8.5亿元，外资看好</li>
+                    <li><strong>机构持仓：</strong>基金持仓比例18.5%，环比上升2.3个百分点</li>
+                    <li><strong>大单流入：</strong>大单流入/流出比 1.8，资金净流入明显</li>
+                </ul>
+            </div>
+
+            <div class="analysis-block">
+                <div class="block-title">📰 情绪面分析</div>
+                <ul class="block-list">
+                    <li><strong>新闻情绪：</strong>近7日正面新闻占比85%，市场情绪乐观</li>
+                    <li><strong>机构评级：</strong>12家机构给予买入评级，0家卖出</li>
+                    <li><strong>市场热度：</strong>东方财富人气榜第3位，关注度高</li>
+                    <li><strong>龙虎榜：</strong>近3日上榜2次，游资+机构联合买入</li>
+                </ul>
+            </div>
+
+            <div class="analysis-block">
+                <div class="block-title">🏭 行业面分析</div>
+                <ul class="block-list">
+                    <li><strong>行业景气度：</strong>CRO行业进入景气上行周期，预计持续2-3年</li>
+                    <li><strong>政策支持：</strong>创新药政策持续利好，带动CRO需求</li>
+                    <li><strong>国际环境：</strong>中国CRO承接全球产业转移，份额持续提升</li>
+                    <li><strong>竞争格局：</strong>行业集中度提升，龙头企业受益明显</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 风险提示 -->
+        <div class="risk-section">
+            <div class="risk-title">⚠️ 风险提示</div>
+            <div class="risk-content">
+                <p><strong>1. 止损纪律：</strong>股价跌破95元（-5%），建议止损离场。</p>
+                <p><strong>2. 行业风险：</strong>创新药政策变化可能影响CRO需求。</p>
+                <p><strong>3. 市场风险：</strong>大盘系统性风险可能带动个股下跌。</p>
+                <p><strong>4. 估值风险：</strong>估值已处于合理区间，短期上涨空间有限。</p>
+                <p><strong>5. 操作建议：</strong>建议分批建仓，控制仓位，避免追高。</p>
+            </div>
+        </div>
+
+        <!-- K线图 -->
+        <div class="chart-section">
+            <div class="section-title">📈 K 线图</div>
+            <div class="chart-placeholder">
+                📊 实时 K 线图（建议使用 TradingView 或 ECharts）
+            </div>
+        </div>
+    </div>
+</body>
+</html>

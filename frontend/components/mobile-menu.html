@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端菜单组件 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            padding: 32px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        .demo-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* 移动端导航栏 */
+        .mobile-navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+        }
+
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 侧边栏菜单 */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background-color: #FFFFFF;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.15);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .mobile-sidebar.show {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-brand {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .sidebar-user {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .sidebar-menu {
+            padding: 8px 0;
+        }
+
+        .menu-section-title {
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: #111827;
+            font-size: 15px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: #F9FAFB;
+        }
+
+        .menu-item.active {
+            background-color: #DBEAFE;
+            border-left-color: #1E3A8A;
+            font-weight: 600;
+            color: #1E3A8A;
+        }
+
+        .menu-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-badge {
+            margin-left: auto;
+            background-color: #EF4444;
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid #E5E7EB;
+            margin-top: auto;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            color: #6B7280;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .footer-item:hover {
+            color: #111827;
+        }
+
+        /* 遮罩层 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 底部标签栏 */
+        .bottom-tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #FFFFFF;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            padding: 8px;
+            color: #6B7280;
+            font-size: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .tab-item.active {
+            color: #1E3A8A;
+        }
+
+        .tab-icon {
+            font-size: 22px;
+        }
+
+        .demo-note {
+            background-color: #DBEAFE;
+            border-left: 4px solid #1E3A8A;
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1E3A8A;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background-color: #111827;
+            color: #F9FAFB;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="demo-title">📱 移动端菜单组件规范</h1>
+
+    <!-- 导航栏 + 汉堡菜单 -->
+    <div class="demo-section">
+        <div class="section-title">1. 移动端顶部导航栏</div>
+        <div class="mobile-navbar">
+            <div class="navbar-brand">量子财富</div>
+            <button class="hamburger-btn" id="openMenu">☰</button>
+        </div>
+
+        <div class="demo-note">
+            <strong>设计要点：</strong><br>
+            • 高度：48px<br>
+            • 背景色：#1E3A8A（深蓝）<br>
+            • 汉堡图标：24px，居右<br>
+            • 点击汉堡图标打开侧边栏
+        </div>
+    </div>
+
+    <!-- 侧边栏菜单 -->
+    <div class="demo-section">
+        <div class="section-title">2. 侧边栏菜单（Drawer）</div>
+        <button style="padding: 10px 20px; background-color: #1E3A8A; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 20px;" id="demoOpen">
+            点击查看侧边栏示例
+        </button>
+
+        <div class="demo-note">
+            <strong>设计要点：</strong><br>
+            • 宽度：280px（最大 80vw）<br>
+            • 从左侧滑入，动画时间 0.3s<br>
+            • 包含用户信息、主菜单、底部功能<br>
+            • 点击遮罩层或关闭按钮收回<br>
+            • 支持滚动（内容过多时）
+        </div>
+    </div>
+
+    <!-- 底部标签栏 -->
+    <div class="demo-section">
+        <div class="section-title">3. 底部标签栏（Tab Bar）</div>
+        <div class="bottom-tab-bar" style="position: relative; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
+            <a href="#" class="tab-item active">
+                <span class="tab-icon">📊</span>
+                <span>指数</span>
+            </a>
+            <a href="#" class="tab-item">
+                <span class="tab-icon">💰</span>
+                <span>资金流</span>
+            </a>
+            <a href="#" class="tab-item">
+                <span class="tab-icon">🤖</span>
+                <span>AI推荐</span>
+            </a>
+            <a href="#" class="tab-item">
+                <span class="tab-icon">⭐</span>
+                <span>自选</span>
+            </a>
+        </div>
+
+        <div class="demo-note" style="margin-top: 80px;">
+            <strong>设计要点：</strong><br>
+            • 高度：56px<br>
+            • 固定在底部（position: fixed）<br>
+            • 4-5 个主要功能入口<br>
+            • 图标 22px，文字 12px<br>
+            • Active 状态：#1E3A8A<br>
+            • 默认状态：#6B7280
+        </div>
+    </div>
+
+    <!-- JavaScript 代码示例 -->
+    <div class="demo-section">
+        <div class="section-title">4. JavaScript 交互代码</div>
+        <div class="code-block">
+// 打开侧边栏
+document.getElementById('openMenu').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.add('show');
+    document.getElementById('overlay').classList.add('show');
+});
+
+// 关闭侧边栏
+document.getElementById('closeMenu').addEventListener('click', closeSidebar);
+document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('show');
+    document.getElementById('overlay').classList.remove('show');
+}
+
+// 阻止侧边栏内部点击关闭
+document.getElementById('sidebar').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
+// 菜单项点击
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', function() {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        // 延迟关闭，给用户反馈
+        setTimeout(closeSidebar, 300);
+    });
+});
+        </div>
+    </div>
+
+    <!-- 实际侧边栏（隐藏） -->
+    <div class="overlay" id="overlay"></div>
+    <div class="mobile-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">量子财富</div>
+            <button class="close-btn" id="closeMenu">✕</button>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar">用</div>
+            <div class="user-info">
+                <div class="user-name">用户名</div>
+                <div class="user-email">user@example.com</div>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section-title">市场数据</div>
+            <a href="#" class="menu-item active">
+                <span class="menu-icon">📊</span>
+                <span>全球指数</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">💰</span>
+                <span>板块资金流向</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">📈</span>
+                <span>个股行情</span>
+            </a>
+
+            <div class="menu-section-title">智能推荐</div>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">🤖</span>
+                <span>AI 精选推荐</span>
+                <span class="menu-badge">5</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">📊</span>
+                <span>准确率追踪</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">📜</span>
+                <span>历史记录</span>
+            </a>
+
+            <div class="menu-section-title">个人中心</div>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">⭐</span>
+                <span>我的自选</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">🔔</span>
+                <span>消息通知</span>
+                <span class="menu-badge">12</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="menu-icon">⚙️</span>
+                <span>系统设置</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="footer-item">
+                <span>🌙</span>
+                <span>深色模式</span>
+            </div>
+            <div class="footer-item">
+                <span>❓</span>
+                <span>帮助中心</span>
+            </div>
+            <div class="footer-item" style="color: #EF4444;">
+                <span>🚪</span>
+                <span>退出登录</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 打开侧边栏
+        document.getElementById('openMenu').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        });
+
+        document.getElementById('demoOpen').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        });
+
+        // 关闭侧边栏
+        document.getElementById('closeMenu').addEventListener('click', closeSidebar);
+        document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // 阻止侧边栏内部点击关闭
+        document.getElementById('sidebar').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>

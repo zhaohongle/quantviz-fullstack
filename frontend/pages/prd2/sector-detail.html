@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>半导体板块详情 - 量子财富智能交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .breadcrumb {
+            background-color: #FFFFFF;
+            padding: 12px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .breadcrumb a {
+            color: #1E3A8A;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* 板块头部 */
+        .sector-header {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .sector-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .sector-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .sector-code {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+
+        .sector-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .stat-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .stat-value.up {
+            color: #EF4444;
+        }
+
+        .stat-value.down {
+            color: #10B981;
+        }
+
+        /* 趋势图 */
+        .chart-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .chart-btn {
+            padding: 6px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: #FFFFFF;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chart-btn.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(to bottom, #F9FAFB 0%, #FFFFFF 100%);
+            border: 1px dashed #E5E7EB;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        /* 成分股列表 */
+        .stocks-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stocks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 2px solid #E5E7EB;
+            font-size: 14px;
+            color: #111827;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #F9FAFB;
+            cursor: pointer;
+        }
+
+        .table-number {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+        }
+
+        .stock-name-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stock-name {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .stock-code {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .btn-add {
+            background-color: transparent;
+            color: #1E3A8A;
+            border: 1px solid #1E3A8A;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background-color: #DBEAFE;
+        }
+
+        /* TOP 10 个股 */
+        .top-stocks-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .top-stocks-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .stock-item {
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stock-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stock-rank {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            width: 24px;
+        }
+
+        .stock-item-right {
+            text-align: right;
+        }
+
+        .stock-price {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stock-change {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .breadcrumb {
+                padding: 8px 16px;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .sector-header {
+                padding: 16px;
+            }
+
+            .sector-title {
+                font-size: 20px;
+            }
+
+            .sector-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-controls {
+                flex-wrap: wrap;
+            }
+
+            .top-stocks-section {
+                grid-template-columns: 1fr;
+            }
+
+            .table-wrapper {
+                overflow-x: scroll;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-link">全球指数</a>
+            <a href="#" class="nav-link active">板块资金流向</a>
+            <a href="#" class="nav-link">AI 精选推荐</a>
+            <a href="#" class="nav-link">自选股</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a> / <a href="#">板块资金流向</a> / 半导体
+    </div>
+
+    <div class="container">
+        <!-- 板块头部 -->
+        <div class="sector-header">
+            <div class="sector-title-row">
+                <div>
+                    <div class="sector-title">半导体板块</div>
+                    <div class="sector-code">BK0447 · 行业板块</div>
+                </div>
+            </div>
+
+            <div class="sector-stats">
+                <div class="stat-item">
+                    <div class="stat-label">资金流向</div>
+                    <div class="stat-value up">+285.12 亿</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">板块涨跌</div>
+                    <div class="stat-value up">+4.23% ↑</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">领涨股</div>
+                    <div class="stat-value">北方华创</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">成分股数量</div>
+                    <div class="stat-value">128 只</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">上涨股数</div>
+                    <div class="stat-value up">102 只</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">平盘股数</div>
+                    <div class="stat-value">8 只</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">下跌股数</div>
+                    <div class="stat-value down">18 只</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">成交额</div>
+                    <div class="stat-value">1,245 亿元</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资金流向趋势图 -->
+        <div class="chart-section">
+            <div class="section-title">📈 资金流向趋势</div>
+            <div class="chart-controls">
+                <button class="chart-btn">今日</button>
+                <button class="chart-btn active">近5日</button>
+                <button class="chart-btn">近10日</button>
+                <button class="chart-btn">近30日</button>
+            </div>
+            <div class="chart-placeholder">
+                📊 资金流向趋势图（建议使用 ECharts 折线图 + 柱状图组合）
+            </div>
+        </div>
+
+        <!-- TOP 10 个股 -->
+        <div class="top-stocks-section">
+            <!-- 涨幅榜 -->
+            <div class="top-stocks-card">
+                <div class="section-title">📈 涨幅榜 TOP 10</div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">1</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">北方华创</div>
+                            <div class="stock-code">002371</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price">¥312.45</div>
+                        <div class="stock-change" style="color: #EF4444;">+8.75%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">2</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">中芯国际</div>
+                            <div class="stock-code">688981</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price">¥58.32</div>
+                        <div class="stock-change" style="color: #EF4444;">+7.88%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">3</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">韦尔股份</div>
+                            <div class="stock-code">603501</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price">¥112.88</div>
+                        <div class="stock-change" style="color: #EF4444;">+7.12%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">4</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">兆易创新</div>
+                            <div class="stock-code">603986</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price">¥185.45</div>
+                        <div class="stock-change" style="color: #EF4444;">+6.55%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">5</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">长电科技</div>
+                            <div class="stock-code">600584</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price">¥28.77</div>
+                        <div class="stock-change" style="color: #EF4444;">+6.23%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资金流入榜 -->
+            <div class="top-stocks-card">
+                <div class="section-title">💰 资金流入 TOP 10</div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">1</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">北方华创</div>
+                            <div class="stock-code">002371</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price" style="color: #EF4444;">+35.2 亿</div>
+                        <div class="stock-change" style="color: #EF4444;">+8.75%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">2</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">中芯国际</div>
+                            <div class="stock-code">688981</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price" style="color: #EF4444;">+28.5 亿</div>
+                        <div class="stock-change" style="color: #EF4444;">+7.88%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">3</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">韦尔股份</div>
+                            <div class="stock-code">603501</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price" style="color: #EF4444;">+22.8 亿</div>
+                        <div class="stock-change" style="color: #EF4444;">+7.12%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">4</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">兆易创新</div>
+                            <div class="stock-code">603986</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price" style="color: #EF4444;">+18.3 亿</div>
+                        <div class="stock-change" style="color: #EF4444;">+6.55%</div>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-item-left">
+                        <div class="stock-rank">5</div>
+                        <div class="stock-name-cell">
+                            <div class="stock-name">长电科技</div>
+                            <div class="stock-code">600584</div>
+                        </div>
+                    </div>
+                    <div class="stock-item-right">
+                        <div class="stock-price" style="color: #EF4444;">+15.7 亿</div>
+                        <div class="stock-change" style="color: #EF4444;">+6.23%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成分股列表 -->
+        <div class="stocks-section">
+            <div class="stocks-header">
+                <div class="section-title">📋 成分股列表（128 只）</div>
+                <div class="filter-group">
+                    <select class="filter-select">
+                        <option>按涨跌幅排序</option>
+                        <option>按资金流入排序</option>
+                        <option>按成交额排序</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>股票名称</th>
+                            <th>最新价</th>
+                            <th>涨跌幅</th>
+                            <th>涨跌额</th>
+                            <th>资金流向</th>
+                            <th>成交额</th>
+                            <th>换手率</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="stock-name-cell">
+                                    <div class="stock-name">北方华创</div>
+                                    <div class="stock-code">002371</div>
+                                </div>
+                            </td>
+                            <td class="table-number">312.45</td>
+                            <td class="table-number" style="color: #EF4444;">+8.75%</td>
+                            <td class="table-number" style="color: #EF4444;">+25.12</td>
+                            <td class="table-number" style="color: #EF4444;">+35.2 亿</td>
+                            <td class="table-number">128.5 亿</td>
+                            <td class="table-number">5.23%</td>
+                            <td><button class="btn-add">加自选</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name-cell">
+                                    <div class="stock-name">中芯国际</div>
+                                    <div class="stock-code">688981</div>
+                                </div>
+                            </td>
+                            <td class="table-number">58.32</td>
+                            <td class="table-number" style="color: #EF4444;">+7.88%</td>
+                            <td class="table-number" style="color: #EF4444;">+4.25</td>
+                            <td class="table-number" style="color: #EF4444;">+28.5 亿</td>
+                            <td class="table-number">98.2 亿</td>
+                            <td class="table-number">3.88%</td>
+                            <td><button class="btn-add">加自选</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name-cell">
+                                    <div class="stock-name">韦尔股份</div>
+                                    <div class="stock-code">603501</div>
+                                </div>
+                            </td>
+                            <td class="table-number">112.88</td>
+                            <td class="table-number" style="color: #EF4444;">+7.12%</td>
+                            <td class="table-number" style="color: #EF4444;">+7.50</td>
+                            <td class="table-number" style="color: #EF4444;">+22.8 亿</td>
+                            <td class="table-number">75.5 亿</td>
+                            <td class="table-number">4.12%</td>
+                            <td><button class="btn-add">加自选</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name-cell">
+                                    <div class="stock-name">兆易创新</div>
+                                    <div class="stock-code">603986</div>
+                                </div>
+                            </td>
+                            <td class="table-number">185.45</td>
+                            <td class="table-number" style="color: #EF4444;">+6.55%</td>
+                            <td class="table-number" style="color: #EF4444;">+11.40</td>
+                            <td class="table-number" style="color: #EF4444;">+18.3 亿</td>
+                            <td class="table-number">62.8 亿</td>
+                            <td class="table-number">3.77%</td>
+                            <td><button class="btn-add">加自选</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name-cell">
+                                    <div class="stock-name">长电科技</div>
+                                    <div class="stock-code">600584</div>
+                                </div>
+                            </td>
+                            <td class="table-number">28.77</td>
+                            <td class="table-number" style="color: #EF4444;">+6.23%</td>
+                            <td class="table-number" style="color: #EF4444;">+1.69</td>
+                            <td class="table-number" style="color: #EF4444;">+15.7 亿</td>
+                            <td class="table-number">55.2 亿</td>
+                            <td class="table-number">4.88%</td>
+                            <td><button class="btn-add">加自选</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // ========== QuantViz API Integration Library ==========
 // 统一的API集成模块，供所有页面使用
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // ========== Mock Data（降级使用） ==========
 const mockData = {

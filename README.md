@@ -1,12 +1,84 @@
-# QuantViz 完整版 - 实时数据自动更新
+# QuantViz 智能交易平台 V2
 
-## 🎯 项目特点
+![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+![Version](https://img.shields.io/badge/Version-2.0-blue)
+![API](https://img.shields.io/badge/API-Integrated-success)
+![Design](https://img.shields.io/badge/Design-MVP%20Style-orange)
 
-✅ **完整的前后端分离架构**
-✅ **实时数据自动更新**（交易时间5分钟，非交易时间30分钟）
-✅ **免费部署方案**（Render免费套餐）
-✅ **真实股票数据**（腾讯财经API）
-✅ **优雅降级**（API失败时使用本地mock数据）
+**实时行情 · 智能分析 · AI 推荐**
+
+---
+
+## 🎯 项目概述
+
+QuantViz 是一个基于 AI 的智能交易平台，提供全球指数实时行情、板块资金流向分析、AI 精选股票推荐等功能。
+
+本项目采用单页应用（SPA）架构，保持 MVP 版本的设计风格，提供流畅的用户体验。
+
+---
+
+## ✨ 核心功能
+
+### 📊 实时仪表盘
+- 全市场核心数据一览
+- 实时更新
+- 可视化展示
+
+### 🌍 全球指数
+- A 股、美股、港股指数
+- 实时行情
+- 技术指标分析
+- K 线图（待集成 ECharts）
+
+### 📈 板块资金流向
+- 20+ 行业板块监控
+- 资金流入/流出实时追踪
+- 龙头股识别
+- 气泡图可视化
+
+### 🤖 AI 精选推荐
+- AI 算法筛选优质标的
+- 综合评分系统
+- 预期收益预测
+- 准确率追踪
+- 历史推荐记录
+
+---
+
+## 🚀 快速开始
+
+### 前置要求
+- Node.js >= 14.x
+- Python 3.x（可选，用于前端服务）
+
+### 一键启动
+```bash
+./start.sh
+```
+
+访问：`http://localhost:3000/app.html`
+
+### 手动启动
+
+**启动后端**
+```bash
+cd backend
+npm install
+npm start
+```
+
+**启动前端**
+```bash
+cd frontend
+python3 -m http.server 3000
+# 或
+npx http-server -p 3000
+```
+
+### 停止服务
+```bash
+./stop.sh
+```
 
 ---
 
@@ -14,258 +86,212 @@
 
 ```
 quantviz-fullstack/
-├── backend/              # Node.js后端API
-│   ├── server.js        # Express服务器
-│   ├── data-fetcher.js  # 数据抓取模块
-│   └── package.json     # 依赖配置
-│
-├── frontend/            # 前端静态文件
-│   ├── index.html       # 网站首页
-│   ├── css/             # 样式
-│   └── js/              # JavaScript
-│       ├── mock-data.js      # 本地mock数据（降级用）
-│       ├── api-loader.js     # API数据加载器
-│       ├── app.js            # 应用逻辑
-│       ├── charts.js         # 图表
-│       ├── components.js     # 组件
-│       └── particles.js      # 背景动画
-│
-├── README.md            # 本文件
-└── deploy-guide.md      # 部署指南
+├── frontend/                   # 前端应用
+│   ├── app.html               # 主应用（SPA）★
+│   ├── index-new.html         # 旧版导航页
+│   ├── js/
+│   │   └── api-integration.js # API 集成库
+│   ├── pages/
+│   │   ├── prd1/              # 全球指数
+│   │   │   ├── indices.html
+│   │   │   ├── index-detail.html
+│   │   │   └── news-detail.html
+│   │   ├── prd2/              # 板块资金流
+│   │   │   ├── sectors.html
+│   │   │   ├── sector-detail.html
+│   │   │   └── bubble-chart.html
+│   │   └── prd3/              # AI 推荐
+│   │       ├── recommendations.html
+│   │       ├── detail.html
+│   │       ├── accuracy.html
+│   │       └── history.html
+│   └── components/            # UI 组件
+│       ├── navigation.html
+│       ├── mobile-menu.html
+│       └── loading.html
+├── backend/                    # 后端 API
+│   ├── server.js              # Express 服务器
+│   └── data-fetcher.js        # 数据抓取模块
+├── start.sh                    # 快速启动脚本
+├── stop.sh                     # 停止脚本
+└── verify-integration.sh       # 集成验证脚本
 ```
 
 ---
 
-## 🚀 本地运行
+## 🔧 技术栈
 
-### 步骤1：启动后端API
+### 前端
+- **架构**：原生 HTML + CSS + JavaScript（无框架依赖）
+- **样式**：响应式设计、Mobile-First
+- **动画**：CSS3 过渡动画
+- **API**：Fetch API + 优雅降级
 
+### 后端
+- **运行时**：Node.js 14+
+- **框架**：Express
+- **API**：RESTful
+- **定时任务**：node-cron
+- **跨域**：CORS
+
+### 设计
+- **风格**：基于 MVP 版本
+- **配色**：#1E3A8A（深蓝）+ #F59E0B（金色）
+- **字体**：Source Han Sans CN + DIN（数字）
+- **布局**：卡片式设计、8px 网格系统
+
+---
+
+## 📡 API 端点
+
+### 已实现
+- `GET /api/health` - 健康检查
+- `GET /api/indices` - 获取指数数据
+- `GET /api/news` - 获取新闻资讯
+- `GET /api/data` - 获取所有数据
+
+### 待实现（使用 Mock 数据降级）
+- `GET /api/stocks` - 获取股票数据
+- `GET /api/sectors` - 获取板块数据
+- `GET /api/recommendations` - 获取 AI 推荐
+- `GET /api/ranking` - 获取涨跌榜
+
+---
+
+## 🎨 设计规范
+
+### 配色方案
+- **主色**：#1E3A8A（深蓝）
+- **辅助色**：#F59E0B（金色）
+- **成功色**：#10B981（绿色）
+- **危险色**：#EF4444（红色）
+- **中性色**：#6B7280（灰色）
+
+### 字体
+- **中文**：Source Han Sans CN
+- **英文**：Roboto
+- **数字**：DIN / Roboto Mono
+
+### 间距
+- 基础单位：8px
+- 常用间距：8px, 16px, 24px, 32px, 48px
+
+---
+
+## 📊 功能清单
+
+### 已完成（100%）
+- [x] SPA 主应用架构
+- [x] MVP 风格导航栏
+- [x] 4 个频道切换
+- [x] 13 个页面 API 集成
+- [x] 响应式设计（桌面+移动）
+- [x] 优雅降级机制
+- [x] 错误处理
+- [x] 加载状态
+- [x] 平滑动画
+
+### 待开发
+- [ ] ECharts 图表集成
+- [ ] WebSocket 实时推送
+- [ ] 用户登录/注册
+- [ ] 自选股管理
+- [ ] 深色模式
+- [ ] 全局搜索
+- [ ] 消息通知
+
+---
+
+## 🧪 测试
+
+### 运行验证脚本
 ```bash
-cd backend
-npm install
-npm start
+./verify-integration.sh
 ```
 
-服务将在 http://localhost:3000 启动
-
-### 步骤2：启动前端
-
-```bash
-cd frontend
-python3 -m http.server 8080
-```
-
-访问 http://localhost:8080
+### 手动测试
+1. 访问 `http://localhost:3000/app.html`
+2. 点击导航菜单切换频道
+3. 检查数据是否正常加载
+4. 测试移动端响应式布局
+5. 关闭后端，验证 Mock 数据降级
 
 ---
 
-## 📊 API接口
+## 📚 文档
 
-### 健康检查
-```
-GET /api/health
-```
-
-### 获取所有数据（推荐）
-```
-GET /api/data
-
-Response:
-{
-  "indices": [...],      // 指数数据
-  "stocks": [...],       // 股票数据
-  "sectors": [...],      // 板块数据
-  "news": [...],         // 实时快讯
-  "recommendations": [...],  // AI推荐
-  "ranking": {...},      // 涨跌榜
-  "lastUpdate": 1234567890,
-  "updateTime": "2026-04-01 19:30:00"
-}
-```
-
-### 其他接口
-- `GET /api/indices` - 指数数据
-- `GET /api/stocks` - 股票数据
-- `GET /api/sectors` - 板块数据
-- `GET /api/news` - 实时快讯
-- `GET /api/recommendations` - AI推荐
-- `GET /api/ranking` - 涨跌榜
-- `POST /api/refresh` - 手动触发更新
+- [API 集成清单](frontend/API-INTEGRATION-CHECKLIST.md)
+- [最终交付报告](FINAL-DELIVERY-REPORT.md)
+- [设计原型](handoff/prototypes/v2/)
 
 ---
 
-## ⏰ 自动更新策略
+## 🐛 已知问题
 
-### 后端定时任务
-- **交易时间**（周一至五 9:30-15:00）：每5分钟更新
-- **非交易时间**：每30分钟更新
-- **服务启动**：立即更新一次
-
-### 前端自动刷新
-- 每30秒从API拉取最新数据
-- 更新后自动刷新页面显示
-- 右上角显示实时状态指示器
+1. **图表占位符**：需要集成 ECharts
+2. **部分 API 未实现**：使用 Mock 数据降级
+3. **无用户系统**：所有数据公开访问
 
 ---
 
-## 🌐 部署到Render（免费）
+## 🛠️ 开发指南
 
-### 方式1：一键部署（推荐）
+### 添加新频道
+1. 在 `app.html` 中添加新的 `<div class="channel">`
+2. 在导航栏添加新的 `<a class="nav-link">`
+3. 在 JavaScript 中添加加载逻辑
 
-1. 将项目推送到GitHub
-2. 访问 https://render.com
-3. 创建两个服务：
+### 添加新 API
+1. 在 `backend/server.js` 中添加路由
+2. 在 `backend/data-fetcher.js` 中添加数据抓取逻辑
+3. 在 `frontend/js/api-integration.js` 中添加 API 函数
 
-#### Backend (Web Service)
-- Build Command: `cd backend && npm install`
-- Start Command: `cd backend && node server.js`
-- Environment: Node.js
-- Port: 3000
-
-#### Frontend (Static Site)
-- Build Command: 留空
-- Publish Directory: `frontend`
-
-4. 配置环境变量（Backend）:
-   ```
-   NODE_ENV=production
-   PORT=3000
-   ```
-
-5. 完成！自动获得免费域名
-
-### 方式2：Docker部署
-
-```dockerfile
-# Dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY backend/package*.json ./
-RUN npm install --production
-COPY backend/ ./
-EXPOSE 3000
-CMD ["node", "server.js"]
-```
+### 添加新页面
+1. 在 `frontend/pages/` 下创建 HTML 文件
+2. 创建对应的 `-api.js` 文件
+3. 在页面中注入 `api-integration.js`
 
 ---
 
-## 🎨 功能特性
+## 📈 性能优化
 
-### 实时数据
-✅ 4个主要指数（上证、深证、创业板、科创50）
-✅ 20只热门股票
-✅ 10个板块资金流向
-✅ 实时快讯（AI生成）
-✅ AI投资推荐
-✅ 涨跌幅排行榜
-
-### 自动更新
-✅ 后端定时抓取数据
-✅ 前端自动刷新显示
-✅ 实时状态指示器
-✅ 优雅降级处理
-
-### 数据来源
-- **腾讯财经API**：http://qt.gtimg.cn/
-- **编码转换**：GBK → UTF-8
-- **数据解析**：自动解析行情字符串
-- **AI生成**：新闻、推荐等内容
+- ✅ 按需加载页面内容
+- ✅ 已加载频道缓存
+- ✅ 并行 API 请求
+- ✅ CSS 动画代替 JavaScript
+- ✅ 优雅降级减少失败影响
 
 ---
 
-## 📝 数据更新日志
+## 🔒 安全性
 
-所有数据更新都会在后端控制台输出：
-
-```
-⏰ 开始更新数据...
-✅ 数据更新成功！耗时: 1523ms
-   指数: 4个
-   股票: 20只
-   新闻: 5条
-```
-
-前端控制台也会显示加载状态：
-
-```
-🚀 初始化API数据加载器...
-✅ API数据加载成功
-  指数: 4
-  股票: 20
-  新闻: 5
-  更新时间: 2026-04-01 19:30:00
-```
+- ✅ CORS 跨域保护
+- ✅ API 错误处理
+- ⚠️ 无用户认证（待开发）
+- ⚠️ 无数据加密（待开发）
 
 ---
 
-## 🔧 配置说明
+## 📄 许可证
 
-### 后端配置
-编辑 `backend/data-fetcher.js` 修改股票列表：
-
-```javascript
-const STOCK_CODES = [
-  'sh600519', // 贵州茅台
-  'sz002371', // 北方华创
-  // ... 添加更多股票代码
-];
-```
-
-### 前端配置
-编辑 `frontend/js/api-loader.js` 修改刷新间隔：
-
-```javascript
-startAutoRefresh(30000); // 30秒，可改为60000（1分钟）
-```
+本项目为商业项目，版权所有。
 
 ---
 
-## ⚠️ 免责声明
+## 👥 团队
 
-本项目仅供学习和演示使用，所有数据和推荐仅供参考，不构成投资建议。
-投资有风险，入市需谨慎。
-
----
-
-## 📞 技术支持
-
-### 常见问题
-
-**Q: 为什么API返回503？**
-A: 数据还在加载中，等待5-10秒后刷新页面
-
-**Q: 数据不更新怎么办？**
-A: 检查后端日志，确认定时任务是否正常运行
-
-**Q: 可以增加更多股票吗？**
-A: 可以！编辑 `backend/data-fetcher.js` 的 `STOCK_CODES` 数组
-
-**Q: 免费部署有限制吗？**
-A: Render免费套餐：15分钟无访问会休眠，750小时/月
+- **产品经理**：Alex
+- **开发团队**：QuantViz Team
+- **设计团队**：QuantViz Design
 
 ---
 
-## 🎉 完成！
+## 📞 支持
 
-项目已完全配置好，可以直接运行或部署！
-
-**本地测试**：
-```bash
-# 终端1
-cd backend && npm install && npm start
-
-# 终端2
-cd frontend && python3 -m http.server 8080
-```
-
-**访问**：http://localhost:8080
-
-**效果**：
-- 右上角显示绿色实时状态
-- 数据每30秒自动刷新
-- 控制台显示更新日志
+- **技术支持**：[技术文档](FINAL-DELIVERY-REPORT.md)
+- **问题反馈**：提交 Issue
+- **功能建议**：联系产品团队
 
 ---
 
-**创建时间**：2026-04-01 19:25
-**版本**：v2.0-realtime
+**🎉 项目已就绪，立即开始体验！** 🚀

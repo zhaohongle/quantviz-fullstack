@@ -1,47 +1,28 @@
 {
   "version": 2,
-  "name": "quantviz-fullstack",
-  "builds": [
+  "rewrites": [
     {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "backend/api/**/*.js",
-      "use": "@vercel/node"
+      "source": "/(.*)",
+      "destination": "/frontend/$1"
     }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "/backend/api/$1"
-    },
-    {
-      "src": "/css/(.*)",
-      "dest": "/frontend/css/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/frontend/js/$1"
-    },
-    {
-      "src": "/pages/(.*)",
-      "dest": "/frontend/pages/$1"
-    },
-    {
-      "src": "/components/(.*)",
-      "dest": "/frontend/components/$1"
-    },
-    {
-      "src": "/app-v2.html",
-      "dest": "/frontend/app-v2.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type"
+        }
+      ]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }

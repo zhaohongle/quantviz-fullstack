@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自选股 - QuantViz</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Source Han Sans CN', sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+        .header {
+            background: #1E3A8A;
+            color: #FFF;
+            padding: 20px 32px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 32px;
+        }
+        .watchlist-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .stock-card {
+            background: #FFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stock-info h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .stock-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #EF4444;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-danger {
+            background: #EF4444;
+            color: #FFF;
+        }
+        .add-btn {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #F59E0B;
+            color: #FFF;
+            font-size: 32px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #FFF;
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⭐ 我的自选股</h1>
+        <p>管理你关注的股票</p>
+    </div>
+
+    <div class="container">
+        <div class="watchlist-grid" id="watchlistGrid">
+            <!-- 动态加载 -->
+        </div>
+    </div>
+
+    <button class="add-btn" onclick="showAddModal()">+</button>
+
+    <!-- 添加弹窗 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h2>添加自选股</h2>
+            <input type="text" id="searchInput" placeholder="输入股票代码或名称">
+            <div style="margin-top: 16px;">
+                <button class="btn btn-danger" onclick="hideAddModal()">取消</button>
+                <button class="btn" style="background: #F59E0B; color: #FFF; margin-left: 8px;" onclick="addStock()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刷新管理器 -->
+    <script src="../../js/refresh-manager.js"></script>
+
+    <script>
+        let watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+
+        // 初始化刷新管理器
+        RefreshManager.init({
+            onRefresh: async () => {
+                await loadWatchlistPrices();
+            },
+            autoStart: true
+        });
+
+        function renderWatchlist() {
+            const grid = document.getElementById('watchlistGrid');
+            if (watchlist.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #6B7280; padding: 40px;">暂无自选股，点击右下角"+"添加</p>';
+                return;
+            }
+            grid.innerHTML = watchlist.map(stock => `
+                <div class="stock-card">
+                    <div class="stock-info">
+                        <h3>${stock.name} <span style="color: #6B7280; font-size: 14px;">${stock.code}</span></h3>
+                        <div class="stock-price">${stock.price || '--'}</div>
+                        <div style="color: ${stock.change >= 0 ? '#EF4444' : '#10B981'}; font-size: 14px;">
+                            ${stock.change >= 0 ? '+' : ''}${stock.change || '--'}%
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="removeStock('${stock.code}')">删除</button>
+                </div>
+            `).join('');
+        }
+
+        function showAddModal() {
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        function hideAddModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+
+        function addStock() {
+            const input = document.getElementById('searchInput').value;
+            if (!input) {
+                alert('请输入股票代码或名称');
+                return;
+            }
+            
+            // 模拟添加
+            const newStock = {
+                code: input,
+                name: '示例股票',
+                price: 100.00,
+                change: 2.5
+            };
+            
+            watchlist.push(newStock);
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            renderWatchlist();
+            hideAddModal();
+            document.getElementById('searchInput').value = '';
+        }
+
+        function removeStock(code) {
+            if (confirm('确认删除该自选股？')) {
+                watchlist = watchlist.filter(s => s.code !== code);
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+                renderWatchlist();
+            }
+        }
+
+        // 加载自选股价格数据（模拟）
+        async function loadWatchlistPrices() {
+            // 模拟价格刷新（实际项目中可调用 API）
+            watchlist = watchlist.map(stock => ({
+                ...stock,
+                price: (stock.price || 100) * (1 + (Math.random() - 0.5) * 0.02),
+                change: (Math.random() - 0.5) * 10
+            }));
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            renderWatchlist();
+            console.log('✅ 自选股价格已刷新');
+        }
+
+        renderWatchlist();
+    </script>
+</body>
+</html>

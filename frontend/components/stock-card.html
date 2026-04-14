@@ -1,0 +1,220 @@
+<!-- 股票卡片组件 -->
+<template id="stock-card-template">
+  <div class="stock-card glass-card">
+    <div class="stock-card-header">
+      <div class="stock-card-info">
+        <span class="stock-code"></span>
+        <span class="stock-name"></span>
+      </div>
+      <button class="stock-star-btn btn-icon" aria-label="添加到自选">⭐</button>
+    </div>
+    
+    <div class="stock-card-price">
+      <span class="current-price"></span>
+      <span class="price-change"></span>
+    </div>
+    
+    <div class="stock-card-meta">
+      <div class="meta-item">
+        <span class="meta-label">成交量</span>
+        <span class="meta-value volume"></span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">成交额</span>
+        <span class="meta-value amount"></span>
+      </div>
+    </div>
+    
+    <div class="stock-card-sparkline">
+      <canvas class="mini-chart"></canvas>
+    </div>
+    
+    <div class="stock-card-actions">
+      <button class="btn btn-secondary btn-sm">详情</button>
+      <button class="btn btn-primary btn-sm">交易</button>
+    </div>
+  </div>
+</template>
+
+<style>
+.stock-card {
+  padding: 20px;
+  cursor: pointer;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stock-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stock-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stock-code {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.stock-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stock-star-btn {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+  transition: var(--transition-fast);
+}
+
+.stock-star-btn:hover,
+.stock-star-btn.active {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.stock-card-price {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.current-price {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.price-change {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stock-card.up .current-price,
+.stock-card.up .price-change {
+  color: var(--up);
+}
+
+.stock-card.down .current-price,
+.stock-card.down .price-change {
+  color: var(--down);
+}
+
+.stock-card-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-size: 11px;
+  color: var(--text-sec);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.meta-value {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stock-card-sparkline {
+  flex: 1;
+  min-height: 40px;
+  position: relative;
+}
+
+.mini-chart {
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+}
+
+.stock-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .stock-card {
+    min-height: 200px;
+  }
+  
+  .stock-name {
+    font-size: 14px;
+  }
+  
+  .current-price {
+    font-size: 24px;
+  }
+}
+</style>
+
+<script>
+// 股票卡片工具函数
+function createStockCard(data) {
+  const template = document.getElementById('stock-card-template');
+  const clone = template.content.cloneNode(true);
+  
+  const card = clone.querySelector('.stock-card');
+  card.classList.add(data.change >= 0 ? 'up' : 'down');
+  
+  clone.querySelector('.stock-code').textContent = data.code;
+  clone.querySelector('.stock-name').textContent = data.name;
+  clone.querySelector('.current-price').textContent = data.price.toFixed(2);
+  clone.querySelector('.price-change').textContent = 
+    `${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)} (${data.changePercent.toFixed(2)}%)`;
+  clone.querySelector('.volume').textContent = formatNumber(data.volume);
+  clone.querySelector('.amount').textContent = formatAmount(data.amount);
+  
+  // 添加点击事件
+  card.addEventListener('click', () => {
+    window.location.href = `stock-detail.html?code=${data.code}`;
+  });
+  
+  return clone;
+}
+
+function formatNumber(num) {
+  if (num >= 100000000) return (num / 100000000).toFixed(2) + '亿';
+  if (num >= 10000) return (num / 10000).toFixed(2) + '万';
+  return num.toFixed(0);
+}
+
+function formatAmount(amount) {
+  if (amount >= 100000000) return (amount / 100000000).toFixed(2) + '亿';
+  if (amount >= 10000) return (amount / 10000).toFixed(2) + '万';
+  return amount.toFixed(0);
+}
+</script>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>股票对比 - QuantViz</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    .compare-container {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .stock-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stock-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+    }
+
+    .compare-btn {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stock-compare-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .chart-container {
+      height: 400px;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <div class="compare-container">
+    <h1>📊 股票对比分析</h1>
+    
+    <div class="stock-selector">
+      <input type="text" class="stock-input" id="stock1" placeholder="输入股票代码 1">
+      <input type="text" class="stock-input" id="stock2" placeholder="输入股票代码 2">
+      <input type="text" class="stock-input" id="stock3" placeholder="输入股票代码 3（可选）">
+      <button class="compare-btn" onclick="compareStocks()">开始对比</button>
+    </div>
+
+    <div id="compareResults"></div>
+    <div id="radarChart" class="chart-container"></div>
+    <div id="lineChart" class="chart-container"></div>
+  </div>
+
+  <script src="../../js/api-integration.js"></script>
+  <script>
+    async function compareStocks() {
+      const codes = [
+        document.getElementById('stock1').value.trim(),
+        document.getElementById('stock2').value.trim(),
+        document.getElementById('stock3').value.trim()
+      ].filter(c => c);
+
+      if (codes.length < 2) {
+        alert('请至少输入2只股票代码');
+        return;
+      }
+
+      try {
+        const promises = codes.map(code => window.API_Integration.fetchStockQuote(code));
+        const results = await Promise.all(promises);
+
+        displayCompareResults(results);
+        drawRadarChart(results);
+        drawLineChart(results);
+      } catch (error) {
+        alert('获取数据失败: ' + error.message);
+      }
+    }
+
+    function displayCompareResults(stocks) {
+      const html = stocks.map(stock => `
+        <div class="stock-compare-card">
+          <h3>${stock.name}</h3>
+          <p>代码: ${stock.code}</p>
+          <p>价格: ¥${stock.price?.toFixed(2)}</p>
+          <p>涨跌幅: ${stock.changePercent?.toFixed(2)}%</p>
+        </div>
+      `).join('');
+
+      document.getElementById('compareResults').innerHTML = `
+        <div class="compare-grid">${html}</div>
+      `;
+    }
+
+    function drawRadarChart(stocks) {
+      const chart = echarts.init(document.getElementById('radarChart'));
+      
+      chart.setOption({
+        title: { text: '指标对比雷达图', textStyle: { color: '#fff' } },
+        legend: { data: stocks.map(s => s.name), textStyle: { color: '#fff' } },
+        radar: {
+          indicator: [
+            { name: '价格', max: 100 },
+            { name: '成交量', max: 100 },
+            { name: '涨跌幅', max: 10 },
+            { name: '换手率', max: 10 }
+          ]
+        },
+        series: [{
+          type: 'radar',
+          data: stocks.map(stock => ({
+            value: [
+              Math.min(stock.price || 0, 100),
+              Math.min((stock.volume || 0) / 1000000, 100),
+              Math.abs(stock.changePercent || 0),
+              Math.random() * 5
+            ],
+            name: stock.name
+          }))
+        }]
+      });
+    }
+
+    function drawLineChart(stocks) {
+      const chart = echarts.init(document.getElementById('lineChart'));
+      
+      const dates = Array.from({length: 30}, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (29 - i));
+        return d.toLocaleDateString();
+      });
+
+      chart.setOption({
+        title: { text: '历史价格对比', textStyle: { color: '#fff' } },
+        legend: { data: stocks.map(s => s.name), textStyle: { color: '#fff' } },
+        xAxis: { data: dates, axisLabel: { color: '#fff' } },
+        yAxis: { axisLabel: { color: '#fff' } },
+        series: stocks.map(stock => ({
+          name: stock.name,
+          type: 'line',
+          data: dates.map(() => (stock.price || 50) + Math.random() * 10 - 5)
+        }))
+      });
+    }
+  </script>
+</body>
+</html>

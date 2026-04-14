@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误处理系统测试 - QuantViz</title>
+    
+    <!-- 引入错误处理系统 -->
+    <script src="../../js/error-handler.js"></script>
+    <script src="../../components/empty-state.html"></script>
+    <script src="../../components/error-boundary.html"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            padding: 32px;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+
+        .test-section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .test-section h2 {
+            font-size: 20px;
+            color: #1E3A8A;
+            margin-bottom: 16px;
+        }
+
+        .test-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .test-btn {
+            padding: 10px 20px;
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .test-btn:hover {
+            background-color: #1E40AF;
+        }
+
+        .test-btn.danger {
+            background-color: #DC2626;
+        }
+
+        .test-btn.danger:hover {
+            background-color: #B91C1C;
+        }
+
+        .test-result {
+            min-height: 200px;
+            background-color: #F9FAFB;
+            border: 2px dashed #E5E7EB;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .status {
+            padding: 8px 12px;
+            background-color: #DBEAFE;
+            color: #1E40AF;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 12px;
+        }
+
+        .status.success {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status.error {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+
+        code {
+            background-color: #F3F4F6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 QuantViz 错误处理系统测试</h1>
+
+        <!-- 测试 1: 网络错误与重试 -->
+        <div class="test-section">
+            <h2>1️⃣ 网络错误与自动重试</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testNetworkRetry()">
+                    测试成功重试（第 2 次成功）
+                </button>
+                <button class="test-btn danger" onclick="testNetworkFail()">
+                    测试失败（3 次重试后失败）
+                </button>
+            </div>
+            <div id="test1-result" class="test-result">
+                点击按钮开始测试...
+            </div>
+        </div>
+
+        <!-- 测试 2: 空状态展示 -->
+        <div class="test-section">
+            <h2>2️⃣ 空状态展示</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="showEmptyState('no-stocks')">
+                    无自选股
+                </button>
+                <button class="test-btn" onclick="showEmptyState('no-recommendations')">
+                    无推荐
+                </button>
+                <button class="test-btn" onclick="showEmptyState('no-search-results')">
+                    搜索无结果
+                </button>
+                <button class="test-btn" onclick="showEmptyState('network-error')">
+                    网络错误
+                </button>
+            </div>
+            <div id="test2-result" class="test-result"></div>
+        </div>
+
+        <!-- 测试 3: 错误边界 -->
+        <div class="test-section">
+            <h2>3️⃣ 错误边界</h2>
+            <div class="test-buttons">
+                <button class="test-btn danger" onclick="triggerComponentError()">
+                    触发组件错误
+                </button>
+                <button class="test-btn" onclick="recoverFromError()">
+                    恢复组件
+                </button>
+            </div>
+            <div id="test3-result" class="test-result" data-error-boundary>
+                <p style="padding: 20px; text-align: center; color: #6B7280;">
+                    正常的组件内容<br>
+                    点击"触发组件错误"测试错误捕获
+                </p>
+            </div>
+        </div>
+
+        <!-- 测试 4: 错误提示 -->
+        <div class="test-section">
+            <h2>4️⃣ 错误提示样式</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="showNotification('error')">
+                    错误提示
+                </button>
+                <button class="test-btn" onclick="showNotification('warning')">
+                    警告提示
+                </button>
+                <button class="test-btn" onclick="showNotification('info')">
+                    信息提示
+                </button>
+                <button class="test-btn" onclick="showNotification('success')">
+                    成功提示
+                </button>
+            </div>
+            <div class="test-result">
+                点击按钮查看不同样式的通知提示（右上角）
+            </div>
+        </div>
+
+        <!-- 测试 5: 全局错误捕获 -->
+        <div class="test-section">
+            <h2>5️⃣ 全局错误捕获</h2>
+            <div class="test-buttons">
+                <button class="test-btn danger" onclick="triggerGlobalError()">
+                    触发全局 JS 错误
+                </button>
+                <button class="test-btn danger" onclick="triggerPromiseError()">
+                    触发 Promise 错误
+                </button>
+            </div>
+            <div class="test-result">
+                打开浏览器控制台，点击按钮查看全局错误捕获效果
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="test-section">
+            <h2>📊 测试统计</h2>
+            <div id="stats" style="font-family: monospace; line-height: 2;">
+                加载中...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 测试 1: 网络重试 ==========
+        
+        async function testNetworkRetry() {
+            const resultDiv = document.getElementById('test1-result');
+            resultDiv.innerHTML = '<p>⏳ 测试中...</p>';
+
+            let attemptCount = 0;
+            
+            const mockRequest = async () => {
+                attemptCount++;
+                if (attemptCount < 2) {
+                    throw new Error('Network error');
+                }
+                return { success: true, data: 'Mock data' };
+            };
+
+            try {
+                const result = await ErrorHandler.retryRequest(mockRequest, {
+                    maxRetries: 3,
+                    onRetry: (current, max) => {
+                        resultDiv.innerHTML += `<p>🔄 重试中 ${current}/${max}...</p>`;
+                    }
+                });
+
+                resultDiv.innerHTML += `
+                    <p style="color: #10B981; font-weight: bold;">✅ 测试成功！</p>
+                    <p>总尝试次数: ${attemptCount}</p>
+                    <p>返回数据: <code>${JSON.stringify(result)}</code></p>
+                    <div class="status success">第 ${attemptCount} 次请求成功</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML += `
+                    <p style="color: #DC2626; font-weight: bold;">❌ 测试失败</p>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testNetworkFail() {
+            const resultDiv = document.getElementById('test1-result');
+            resultDiv.innerHTML = '<p>⏳ 测试中...</p>';
+
+            let attemptCount = 0;
+            
+            const mockRequest = async () => {
+                attemptCount++;
+                throw new Error('Network error - always fail');
+            };
+
+            try {
+                await ErrorHandler.retryRequest(mockRequest, {
+                    maxRetries: 3,
+                    onRetry: (current, max) => {
+                        resultDiv.innerHTML += `<p>🔄 重试中 ${current}/${max}...</p>`;
+                    }
+                });
+            } catch (error) {
+                resultDiv.innerHTML += `
+                    <p style="color: #DC2626; font-weight: bold;">❌ 预期的失败（已达最大重试次数）</p>
+                    <p>总尝试次数: ${attemptCount}</p>
+                    <p>错误: <code>${error.message}</code></p>
+                    <div class="status error">所有重试均失败</div>
+                `;
+
+                // 显示错误通知
+                ErrorHandler.showError(error, {
+                    title: '网络请求失败',
+                    message: '已重试 3 次，仍然失败'
+                });
+            }
+        }
+
+        // ========== 测试 2: 空状态 ==========
+        
+        function showEmptyState(type) {
+            EmptyState.show('test2-result', { type });
+        }
+
+        // ========== 测试 3: 错误边界 ==========
+        
+        function triggerComponentError() {
+            try {
+                // 模拟组件错误
+                throw new Error('Component rendering failed: undefined property access');
+            } catch (error) {
+                ErrorBoundary.catch(error, 'test3-result', {
+                    title: '组件渲染错误',
+                    message: '组件在渲染时遇到错误'
+                });
+            }
+        }
+
+        function recoverFromError() {
+            const container = document.getElementById('test3-result');
+            container.innerHTML = `
+                <p style="padding: 20px; text-align: center; color: #10B981; font-weight: bold;">
+                    ✅ 组件已恢复<br>
+                    <span style="font-weight: normal; font-size: 14px; color: #6B7280;">
+                        正常的组件内容
+                    </span>
+                </p>
+            `;
+            ErrorBoundary.clearError('test3-result');
+        }
+
+        // ========== 测试 4: 错误提示 ==========
+        
+        function showNotification(type) {
+            const messages = {
+                error: { title: '错误提示', message: '操作失败，请重试' },
+                warning: { title: '警告提示', message: '请注意，此操作可能有风险' },
+                info: { title: '信息提示', message: '这是一条普通信息' },
+                success: { title: '成功提示', message: '操作已成功完成' }
+            };
+
+            ErrorHandler.showNotification({
+                ...messages[type],
+                type,
+                duration: 5000
+            });
+        }
+
+        // ========== 测试 5: 全局错误 ==========
+        
+        function triggerGlobalError() {
+            // 这会被全局错误监听器捕获
+            setTimeout(() => {
+                throw new Error('Global JavaScript error for testing');
+            }, 100);
+        }
+
+        function triggerPromiseError() {
+            // 这会被 unhandledrejection 监听器捕获
+            Promise.reject(new Error('Unhandled Promise rejection for testing'));
+        }
+
+        // ========== 统计信息 ==========
+        
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            stats.innerHTML = `
+                <div>✅ 错误处理工具: ${window.ErrorHandler ? '已加载' : '未加载'}</div>
+                <div>✅ 空状态组件: ${window.EmptyState ? '已加载' : '未加载'}</div>
+                <div>✅ 错误边界: ${window.ErrorBoundary ? '已加载' : '未加载'}</div>
+                <div>📍 当前模式: ${ErrorHandler.config.isDevelopment ? '开发模式' : '生产模式'}</div>
+                <div>🔁 最大重试次数: ${ErrorHandler.config.maxRetries}</div>
+                <div>⏱️ 重试间隔: ${ErrorHandler.config.retryDelays.join(', ')} ms</div>
+            `;
+        }
+
+        // 初始化
+        updateStats();
+
+        console.log('🧪 测试页面已就绪');
+        console.log('ErrorHandler:', window.ErrorHandler);
+        console.log('EmptyState:', window.EmptyState);
+        console.log('ErrorBoundary:', window.ErrorBoundary);
+    </script>
+</body>
+</html>

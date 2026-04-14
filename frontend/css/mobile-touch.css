@@ -1,0 +1,382 @@
+/* ========== 移动端触摸优化 CSS ========== */
+
+/* ========== 触摸友好：按钮尺寸优化 ========== */
+@media (max-width: 768px) {
+    /* 所有按钮最小触摸区域 44x44px */
+    button,
+    .btn,
+    .nav-link,
+    .mobile-menu-item,
+    .bottom-nav-item,
+    input[type="submit"],
+    input[type="button"],
+    .clickable {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+
+    /* 小图标按钮 */
+    .icon-btn,
+    .settings-btn,
+    .theme-btn,
+    .mobile-menu-btn,
+    .mobile-sidebar-close {
+        min-width: 48px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 表格行可点击优化 */
+    .table-row,
+    .stock-item,
+    .index-card {
+        min-height: 56px;
+        padding: 12px 16px;
+    }
+
+    /* 输入框触摸优化 */
+    input[type="text"],
+    input[type="search"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+        min-height: 44px;
+        font-size: 16px; /* 防止 iOS 自动放大 */
+        padding: 10px 12px;
+    }
+
+    /* 链接触摸优化 */
+    a {
+        padding: 8px 4px;
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+/* ========== 横向滚动优化 ========== */
+
+/* 滚动容器基础样式 */
+.scroll-container-x {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+    scrollbar-width: thin; /* Firefox 细滚动条 */
+    position: relative;
+}
+
+/* 隐藏滚动条（但保持可滚动） */
+.scroll-container-x::-webkit-scrollbar {
+    height: 4px;
+}
+
+.scroll-container-x::-webkit-scrollbar-track {
+    background: #F3F4F6;
+    border-radius: 2px;
+}
+
+.scroll-container-x::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 2px;
+}
+
+.scroll-container-x::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+/* K 线图横向滚动 */
+.chart-container {
+    position: relative;
+}
+
+.chart-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    .chart-scroll-wrapper {
+        /* K 线图容器宽度大于屏幕，强制横向滚动 */
+        min-width: 100%;
+    }
+
+    .chart-scroll-wrapper canvas,
+    .chart-scroll-wrapper svg {
+        min-width: 150%; /* 图表宽度 1.5 倍屏幕宽度 */
+    }
+}
+
+/* 表格横向滚动 */
+.table-wrapper {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -16px; /* 负边距让表格贴边 */
+    padding: 0 16px;
+}
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        margin: 0 -16px;
+    }
+
+    table {
+        min-width: 600px; /* 确保表格宽度超过屏幕 */
+        font-size: 14px;
+    }
+
+    table th,
+    table td {
+        white-space: nowrap; /* 防止文字换行 */
+        padding: 12px 8px;
+    }
+
+    /* 固定第一列（可选） */
+    .table-fixed-first-col th:first-child,
+    .table-fixed-first-col td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #FFFFFF;
+        z-index: 10;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+    }
+}
+
+/* 滚动指示器 */
+.scroll-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(30, 58, 138, 0.8);
+    color: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.scroll-indicator.show {
+    opacity: 1;
+}
+
+.scroll-indicator-left {
+    left: 16px;
+}
+
+.scroll-indicator-right {
+    right: 16px;
+}
+
+/* 横向卡片滚动 */
+.cards-scroll-container {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 0;
+    margin: 0 -16px;
+    padding: 16px;
+    scroll-snap-type: x mandatory; /* 滚动对齐 */
+}
+
+.cards-scroll-container::-webkit-scrollbar {
+    display: none; /* 隐藏滚动条 */
+}
+
+.card-item {
+    flex: 0 0 280px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+@media (max-width: 768px) {
+    .card-item {
+        flex: 0 0 85vw; /* 卡片宽度 85% 屏幕宽度 */
+    }
+}
+
+/* ========== 字体大小优化 ========== */
+@media (max-width: 768px) {
+    /* 基础字号 */
+    body {
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    /* 标题层次 */
+    h1, .h1 {
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 12px;
+    }
+
+    h2, .h2 {
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: 10px;
+    }
+
+    h3, .h3 {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+
+    h4, .h4 {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    /* 正文 */
+    p, .body-text {
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+
+    /* 小字 */
+    .small-text,
+    .caption {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    /* 极小字 */
+    .tiny-text {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    /* 大数字（指数、价格） */
+    .large-number {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    /* 中等数字 */
+    .medium-number {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    /* 导航栏字号 */
+    .navbar-brand {
+        font-size: 18px;
+    }
+
+    .nav-link {
+        font-size: 15px;
+    }
+
+    /* 表格字号 */
+    table {
+        font-size: 14px;
+    }
+
+    table th {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* 按钮字号 */
+    button,
+    .btn {
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    /* 输入框字号（防止 iOS 自动放大） */
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+    }
+}
+
+/* ========== 防止误触优化 ========== */
+
+/* 增加元素间距 */
+@media (max-width: 768px) {
+    .btn-group button {
+        margin: 4px;
+    }
+
+    .action-buttons {
+        gap: 12px;
+    }
+
+    /* 表格行间距 */
+    .table-row + .table-row {
+        margin-top: 8px;
+    }
+
+    /* 卡片间距 */
+    .card + .card {
+        margin-top: 12px;
+    }
+}
+
+/* 禁用双击放大（iOS） */
+@media (max-width: 768px) {
+    * {
+        touch-action: manipulation;
+    }
+
+    /* 允许特定元素双击放大 */
+    .chart-container,
+    img {
+        touch-action: auto;
+    }
+}
+
+/* 触摸反馈效果 */
+@media (max-width: 768px) {
+    .touchable,
+    button,
+    .btn,
+    .mobile-menu-item,
+    .bottom-nav-item,
+    .table-row {
+        -webkit-tap-highlight-color: rgba(30, 58, 138, 0.1);
+        transition: background-color 0.15s;
+    }
+
+    .touchable:active,
+    button:active,
+    .btn:active,
+    .mobile-menu-item:active,
+    .table-row:active {
+        background-color: rgba(30, 58, 138, 0.05);
+    }
+}
+
+/* ========== 横向滚动提示动画 ========== */
+@keyframes scroll-hint {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(-10px);
+    }
+}
+
+.scroll-hint {
+    animation: scroll-hint 1.5s ease-in-out 3;
+    animation-delay: 0.5s;
+}

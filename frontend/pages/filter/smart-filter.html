@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能筛选器 - QuantViz</title>
+    <link rel="stylesheet" href="../../css/dark-theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 20px 32px;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px 40px;
+        }
+
+        /* 搜索框 */
+        .search-box {
+            margin-bottom: 24px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            transition: border 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #F59E0B;
+        }
+
+        /* 策略卡片区 */
+        .strategies-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .strategies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .strategy-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .strategy-card:hover {
+            border-color: #F59E0B;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .strategy-card.active {
+            border-color: #F59E0B;
+            background: var(--bg-card)7ED;
+        }
+
+        .strategy-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .strategy-icon {
+            font-size: 28px;
+        }
+
+        .strategy-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .strategy-desc {
+            font-size: 13px;
+            color: var(--text-sec);
+            margin-bottom: 12px;
+        }
+
+        .strategy-match {
+            font-size: 13px;
+            color: #F59E0B;
+            font-weight: 600;
+        }
+
+        /* 结果区 */
+        .results-section {
+            margin-top: 32px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .results-count {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            cursor: pointer;
+        }
+
+        /* 股票卡片 */
+        .stock-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .stock-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .stock-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stock-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stock-code {
+            font-size: 13px;
+            color: var(--text-sec);
+            margin-left: 8px;
+        }
+
+        .stock-score {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .score-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #F59E0B;
+        }
+
+        .score-stars {
+            color: #F59E0B;
+        }
+
+        .stock-metrics {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .metric {
+            font-size: 14px;
+        }
+
+        .metric-label {
+            color: var(--text-sec);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .positive { color: #EF4444; }
+        .negative { color: #10B981; }
+
+        .stock-reasons {
+            font-size: 14px;
+            color: #4B5563;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .stock-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #F59E0B;
+            color: #FFFFFF;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #D97706;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: #1E3A8A;
+            border: 1px solid #1E3A8A;
+        }
+
+        .btn-secondary:hover {
+            background: #F0F9FF;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-sec);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #E5E7EB;
+            border-top-color: #F59E0B;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px 32px;
+            }
+
+            .strategies-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题 -->
+    <div class="header">
+        <h1>🎯 智能筛选器</h1>
+        <p>6 大策略快速找到优质股票，解决信息过载</p>
+    </div>
+
+    <div class="container">
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <input type="text" placeholder="🔍 快速搜索股票代码或名称..." id="searchInput">
+        </div>
+
+        <!-- 预设策略 -->
+        <div class="strategies-section">
+            <h2 class="section-title">📌 智能策略（一键筛选）</h2>
+            <div class="strategies-grid" id="strategiesGrid">
+                <!-- 动态加载策略卡片 -->
+            </div>
+        </div>
+
+        <!-- 筛选结果 -->
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">正在加载...</div>
+                <select class="sort-select" id="sortSelect">
+                    <option value="score">按 AI 评分排序</option>
+                    <option value="change">按涨跌幅排序</option>
+                    <option value="marketCap">按市值排序</option>
+                </select>
+            </div>
+
+            <div id="resultsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 16px;">正在加载数据...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刷新管理器 -->
+    <script src="../../js/refresh-manager.js"></script>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let currentStocks = [];
+        let currentStrategy = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化刷新管理器
+            RefreshManager.init({
+                onRefresh: async () => {
+                    if (currentStrategy) {
+                        await applyStrategy(currentStrategy);
+                    } else {
+                        await loadDefaultStocks();
+                    }
+                },
+                autoStart: true
+            });
+
+            loadStrategies();
+            loadDefaultStocks();
+        });
+
+        // 加载预设策略
+        async function loadStrategies() {
+            try {
+                const response = await fetch(`${API_BASE}/filter/strategies`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderStrategies(data.data);
+                }
+            } catch (error) {
+                console.error('加载策略失败:', error);
+            }
+        }
+
+        // 渲染策略卡片
+        function renderStrategies(strategies) {
+            const grid = document.getElementById('strategiesGrid');
+            grid.innerHTML = strategies.map(strategy => `
+                <div class="strategy-card" onclick="applyStrategy('${strategy.id}')">
+                    <div class="strategy-header">
+                        <div class="strategy-icon">${strategy.icon}</div>
+                        <div class="strategy-name">${strategy.name}</div>
+                    </div>
+                    <div class="strategy-desc">${strategy.description}</div>
+                    <div class="strategy-match">匹配 ${strategy.matchCount || 0} 只股票</div>
+                </div>
+            `).join('');
+        }
+
+        // 应用策略
+        async function applyStrategy(strategyId) {
+            currentStrategy = strategyId;
+            
+            // 更新卡片状态
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // 显示加载状态
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 16px;">正在筛选...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_BASE}/filter/strategy/${strategyId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentStocks = data.data;
+                    renderStocks(currentStocks);
+                }
+            } catch (error) {
+                console.error('应用策略失败:', error);
+                document.getElementById('resultsContainer').innerHTML = `
+                    <div class="loading">
+                        <p style="color: #EF4444;">加载失败，请重试</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 加载默认股票（AI 推荐）
+        async function loadDefaultStocks() {
+            try {
+                const response = await fetch(`${API_BASE}/recommendations`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentStocks = data.data;
+                    renderStocks(currentStocks);
+                }
+            } catch (error) {
+                console.error('加载默认数据失败:', error);
+            }
+        }
+
+        // 渲染股票列表
+        function renderStocks(stocks) {
+            const container = document.getElementById('resultsContainer');
+            const count = document.getElementById('resultsCount');
+            
+            count.textContent = `找到 ${stocks.length} 只股票`;
+
+            if (stocks.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <p>暂无匹配结果</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="stock-grid">
+                    ${stocks.map(stock => `
+                        <div class="stock-card">
+                            <div class="stock-header">
+                                <div>
+                                    <span class="stock-name">${stock.name || stock.stock}</span>
+                                    <span class="stock-code">${stock.code}</span>
+                                </div>
+                                <div class="stock-score">
+                                    <span class="score-value">${stock.score}</span>
+                                    <span class="score-stars">${getStars(stock.score)}</span>
+                                </div>
+                            </div>
+
+                            <div class="stock-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">涨跌幅</span>
+                                    <span class="metric-value ${stock.changePercent >= 0 ? 'positive' : 'negative'}">
+                                        ${stock.changePercent >= 0 ? '+' : ''}${stock.changePercent}%
+                                    </span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">目标价</span>
+                                    <span class="metric-value">${stock.targetPrice || '--'}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">风险</span>
+                                    <span class="metric-value">${stock.riskLevel || '中'}</span>
+                                </div>
+                            </div>
+
+                            <div class="stock-reasons">
+                                ${stock.reason || stock.summary || '暂无推荐理由'}
+                            </div>
+
+                            <div class="stock-actions">
+                                <button class="btn btn-primary" onclick="viewDetail('${stock.code}')">
+                                    查看详情
+                                </button>
+                                <button class="btn btn-secondary" onclick="addToWatchlist('${stock.code}')">
+                                    加自选
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // 获取星级
+        function getStars(score) {
+            const fullStars = Math.floor(score / 20);
+            return '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+        }
+
+        // 查看详情
+        function viewDetail(code) {
+            window.location.href = `/pages/prd3/recommendation-detail.html?code=${code}`;
+        }
+
+        // 添加到自选
+        function addToWatchlist(code) {
+            alert(`已添加 ${code} 到自选股`);
+        }
+
+        // 排序
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            const sortBy = e.target.value;
+            
+            if (sortBy === 'score') {
+                currentStocks.sort((a, b) => b.score - a.score);
+            } else if (sortBy === 'change') {
+                currentStocks.sort((a, b) => b.changePercent - a.changePercent);
+            } else if (sortBy === 'marketCap') {
+                currentStocks.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
+            }
+            
+            renderStocks(currentStocks);
+        });
+
+        // 搜索
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            
+            if (!keyword) {
+                renderStocks(currentStocks);
+                return;
+            }
+
+            const filtered = currentStocks.filter(stock => 
+                (stock.name && stock.name.toLowerCase().includes(keyword)) ||
+                (stock.code && stock.code.toLowerCase().includes(keyword))
+            );
+            
+            renderStocks(filtered);
+        });
+    </script>
+</body>
+</html>

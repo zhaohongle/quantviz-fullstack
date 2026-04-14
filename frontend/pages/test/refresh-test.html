@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刷新机制测试页面 - QuantViz</title>
+    <script src="../../js/refresh-manager.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1E3A8A;
+        }
+
+        .data-display {
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #6B7280;
+        }
+
+        .data-value {
+            color: #111827;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            padding: 8px 16px;
+            background-color: #3B82F6;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-btn:hover {
+            background-color: #2563EB;
+        }
+
+        .test-btn.danger {
+            background-color: #EF4444;
+        }
+
+        .test-btn.danger:hover {
+            background-color: #DC2626;
+        }
+
+        .test-btn.success {
+            background-color: #10B981;
+        }
+
+        .test-btn.success:hover {
+            background-color: #059669;
+        }
+
+        .log-container {
+            background-color: #111827;
+            color: #F9FAFB;
+            border-radius: 4px;
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            border-bottom: 1px solid #374151;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #9CA3AF;
+            margin-right: 8px;
+        }
+
+        .log-success {
+            color: #10B981;
+        }
+
+        .log-error {
+            color: #EF4444;
+        }
+
+        .log-info {
+            color: #3B82F6;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.active {
+            background-color: #10B981;
+            box-shadow: 0 0 8px #10B981;
+        }
+
+        .status-indicator.inactive {
+            background-color: #6B7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 刷新机制测试页面</h1>
+            <p>用于测试 QuantViz 数据刷新功能的各项特性</p>
+        </div>
+
+        <!-- 当前状态 -->
+        <div class="section">
+            <div class="section-title">📊 当前状态</div>
+            <div class="data-display">
+                <div class="data-item">
+                    <span class="data-label">自动刷新状态</span>
+                    <span class="data-value" id="status-auto-refresh">
+                        <span class="status-indicator inactive"></span>未初始化
+                    </span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">刷新间隔</span>
+                    <span class="data-value" id="status-interval">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">刷新次数</span>
+                    <span class="data-value" id="status-refresh-count">0</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">最后刷新时间</span>
+                    <span class="data-value" id="status-last-refresh">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">模拟数据</span>
+                    <span class="data-value" id="status-mock-data">数据加载中...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 手动测试 -->
+        <div class="section">
+            <div class="section-title">🎮 手动测试</div>
+            <div class="test-controls">
+                <button class="test-btn success" onclick="testManualRefresh()">手动刷新</button>
+                <button class="test-btn" onclick="testSetInterval(30)">设置间隔 30秒</button>
+                <button class="test-btn" onclick="testSetInterval(60)">设置间隔 60秒</button>
+                <button class="test-btn" onclick="testSetInterval(300)">设置间隔 5分钟</button>
+                <button class="test-btn danger" onclick="testStopRefresh()">停止自动刷新</button>
+                <button class="test-btn success" onclick="testStartRefresh()">启动自动刷新</button>
+            </div>
+        </div>
+
+        <!-- 测试日志 -->
+        <div class="section">
+            <div class="section-title">📋 测试日志</div>
+            <div class="log-container" id="logContainer">
+                <div class="log-entry">
+                    <span class="log-time">[00:00:00]</span>
+                    <span class="log-info">等待初始化...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshCount = 0;
+        let mockData = { price: 100.00, change: 0 };
+
+        // 初始化刷新管理器
+        RefreshManager.init({
+            onRefresh: async () => {
+                refreshCount++;
+                
+                // 模拟数据刷新
+                mockData.price = (mockData.price * (1 + (Math.random() - 0.5) * 0.02)).toFixed(2);
+                mockData.change = ((Math.random() - 0.5) * 5).toFixed(2);
+                
+                // 更新显示
+                updateStatus();
+                
+                // 记录日志
+                addLog(`刷新成功（第 ${refreshCount} 次）`, 'success');
+                addLog(`模拟价格: ¥${mockData.price} (${mockData.change > 0 ? '+' : ''}${mockData.change}%)`, 'info');
+                
+                // 模拟延迟
+                await new Promise(resolve => setTimeout(resolve, 500));
+            },
+            autoStart: true
+        });
+
+        // 初始化状态
+        updateStatus();
+        addLog('刷新管理器初始化成功', 'success');
+
+        function updateStatus() {
+            const config = RefreshManager.config;
+            
+            // 更新自动刷新状态
+            const autoRefreshEl = document.getElementById('status-auto-refresh');
+            if (config.autoRefresh) {
+                autoRefreshEl.innerHTML = '<span class="status-indicator active"></span>已启动';
+            } else {
+                autoRefreshEl.innerHTML = '<span class="status-indicator inactive"></span>已停止';
+            }
+            
+            // 更新刷新间隔
+            document.getElementById('status-interval').textContent = `${config.interval} 秒`;
+            
+            // 更新刷新次数
+            document.getElementById('status-refresh-count').textContent = refreshCount;
+            
+            // 更新最后刷新时间
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            document.getElementById('status-last-refresh').textContent = timeStr;
+            
+            // 更新模拟数据
+            document.getElementById('status-mock-data').textContent = 
+                `¥${mockData.price} (${mockData.change > 0 ? '+' : ''}${mockData.change}%)`;
+        }
+
+        function addLog(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-time">[${timeStr}]</span>
+                <span class="log-${type}">${message}</span>
+            `;
+            
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+            
+            // 保持日志数量在合理范围
+            if (container.children.length > 50) {
+                container.removeChild(container.firstChild);
+            }
+        }
+
+        // 测试函数
+        function testManualRefresh() {
+            addLog('触发手动刷新', 'info');
+            RefreshManager.refresh();
+        }
+
+        function testSetInterval(seconds) {
+            addLog(`设置刷新间隔为 ${seconds} 秒`, 'info');
+            RefreshManager.setInterval(seconds);
+            updateStatus();
+        }
+
+        function testStopRefresh() {
+            addLog('停止自动刷新', 'info');
+            RefreshManager.config.autoRefresh = false;
+            RefreshManager.stop();
+            RefreshManager.saveSettings();
+            updateStatus();
+        }
+
+        function testStartRefresh() {
+            addLog('启动自动刷新', 'success');
+            RefreshManager.config.autoRefresh = true;
+            RefreshManager.start();
+            RefreshManager.saveSettings();
+            updateStatus();
+        }
+
+        // 每秒更新状态显示
+        setInterval(updateStatus, 1000);
+    </script>
+</body>
+</html>

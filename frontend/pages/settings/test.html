@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置测试页面 - QuantViz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+      background-color: #F9FAFB;
+      color: #111827;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background-color: #1E3A8A;
+      color: #FFFFFF;
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .test-section {
+      background-color: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .test-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1E3A8A;
+    }
+
+    .test-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background-color: #F9FAFB;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .test-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .test-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1E3A8A;
+      padding: 4px 12px;
+      background-color: #E0E7FF;
+      border-radius: 4px;
+    }
+
+    .price-demo {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .price-card {
+      flex: 1;
+      min-width: 150px;
+      padding: 16px;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .price-label {
+      font-size: 12px;
+      color: #6B7280;
+      margin-bottom: 8px;
+    }
+
+    .price-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'DIN', monospace;
+    }
+
+    .price-change {
+      font-size: 14px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #1E3A8A;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #1E40AF;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: #F3F4F6;
+      color: #374151;
+      border: 1px solid #D1D5DB;
+    }
+
+    .btn-secondary:hover {
+      background-color: #E5E7EB;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.active {
+      background-color: #10B981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+
+    .status-indicator.inactive {
+      background-color: #EF4444;
+    }
+
+    /* 颜色方案样式 */
+    [data-color-scheme="red-green"] .price-up {
+      color: #DC2626;
+    }
+
+    [data-color-scheme="red-green"] .price-down {
+      color: #059669;
+    }
+
+    [data-color-scheme="green-red"] .price-up {
+      color: #059669;
+    }
+
+    [data-color-scheme="green-red"] .price-down {
+      color: #DC2626;
+    }
+
+    .log-box {
+      background-color: #111827;
+      color: #10B981;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 16px;
+    }
+
+    .log-item {
+      margin-bottom: 4px;
+      opacity: 0;
+      animation: fadeIn 0.3s forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 设置测试页面</h1>
+      <p>验证设置实时生效功能</p>
+    </div>
+
+    <!-- 当前设置显示 -->
+    <div class="test-section">
+      <div class="test-title">📊 当前设置</div>
+      <div class="test-item">
+        <div class="test-label">
+          <span class="status-indicator" id="autoRefreshStatus"></span>
+          自动刷新
+        </div>
+        <div class="test-value" id="autoRefreshValue">-</div>
+      </div>
+      <div class="test-item">
+        <div class="test-label">刷新间隔</div>
+        <div class="test-value" id="refreshIntervalValue">-</div>
+      </div>
+      <div class="test-item">
+        <div class="test-label">数据精度</div>
+        <div class="test-value" id="precisionValue">-</div>
+      </div>
+      <div class="test-item">
+        <div class="test-label">涨跌颜色</div>
+        <div class="test-value" id="colorSchemeValue">-</div>
+      </div>
+      <div class="test-item">
+        <div class="test-label">价格提醒</div>
+        <div class="test-value" id="priceAlertValue">-</div>
+      </div>
+      <div class="test-item">
+        <div class="test-label">消息推送</div>
+        <div class="test-value" id="pushNotificationValue">-</div>
+      </div>
+    </div>
+
+    <!-- 价格显示测试 -->
+    <div class="test-section">
+      <div class="test-title">💹 价格显示测试（颜色 + 精度）</div>
+      <div class="price-demo">
+        <div class="price-card">
+          <div class="price-label">贵州茅台</div>
+          <div class="price-value" id="price1">1689.50</div>
+          <div class="price-change price-up" id="change1">+2.35%</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">中国平安</div>
+          <div class="price-value" id="price2">45.67</div>
+          <div class="price-change price-down" id="change2">-1.23%</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">招商银行</div>
+          <div class="price-value" id="price3">38.92</div>
+          <div class="price-change price-up" id="change3">+0.58%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="test-section">
+      <div class="test-title">🎮 操作</div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button class="btn" onclick="openSettings()">⚙️ 打开设置页面</button>
+        <button class="btn btn-secondary" onclick="refreshSettings()">🔄 手动刷新</button>
+        <button class="btn btn-secondary" onclick="clearLog()">🗑️ 清除日志</button>
+      </div>
+    </div>
+
+    <!-- 事件日志 -->
+    <div class="test-section">
+      <div class="test-title">📝 实时事件日志</div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+
+  <script>
+    // 原始价格数据（用于精度测试）
+    const PRICE_DATA = {
+      price1: 1689.5012,
+      price2: 45.6734,
+      price3: 38.9156
+    };
+
+    // 初始化
+    function init() {
+      loadSettings();
+      updateDisplay();
+      
+      // 监听设置更新事件
+      window.addEventListener('settingsUpdated', (event) => {
+        addLog('🔔 检测到设置更新事件');
+        addLog(`📦 更新内容: ${JSON.stringify(event.detail)}`);
+        loadSettings();
+        updateDisplay();
+      });
+
+      // 监听 storage 事件（跨标签页同步）
+      window.addEventListener('storage', (event) => {
+        if (event.key === 'quantviz_settings') {
+          addLog('🔄 检测到 LocalStorage 变化（跨标签页）');
+          loadSettings();
+          updateDisplay();
+        }
+      });
+
+      addLog('✅ 测试页面初始化完成');
+      addLog('💡 请打开设置页面修改配置，观察此页面是否实时更新');
+    }
+
+    // 加载设置
+    function loadSettings() {
+      try {
+        const saved = localStorage.getItem('quantviz_settings');
+        if (saved) {
+          window.currentSettings = JSON.parse(saved);
+        } else {
+          window.currentSettings = null;
+        }
+      } catch (error) {
+        console.error('加载设置失败:', error);
+        addLog(`❌ 加载设置失败: ${error.message}`);
+      }
+    }
+
+    // 更新显示
+    function updateDisplay() {
+      if (!window.currentSettings) {
+        addLog('⚠️ 未找到设置，请先访问设置页面');
+        return;
+      }
+
+      const settings = window.currentSettings;
+
+      // 更新设置显示
+      updateSettingsDisplay(settings);
+
+      // 更新价格显示（应用精度）
+      updatePriceDisplay(settings.precision);
+
+      // 应用颜色方案
+      document.documentElement.setAttribute('data-color-scheme', settings.colorScheme);
+
+      addLog('✨ 显示已更新');
+    }
+
+    function updateSettingsDisplay(settings) {
+      // 自动刷新状态
+      const autoRefreshStatus = document.getElementById('autoRefreshStatus');
+      autoRefreshStatus.className = `status-indicator ${settings.autoRefresh ? 'active' : 'inactive'}`;
+      document.getElementById('autoRefreshValue').textContent = settings.autoRefresh ? '开启' : '关闭';
+
+      // 刷新间隔
+      const intervalText = settings.refreshInterval >= 60 
+        ? `${settings.refreshInterval / 60} 分钟` 
+        : `${settings.refreshInterval} 秒`;
+      document.getElementById('refreshIntervalValue').textContent = intervalText;
+
+      // 数据精度
+      const precisionText = settings.precision === 0 ? '整数' : `${settings.precision} 位小数`;
+      document.getElementById('precisionValue').textContent = precisionText;
+
+      // 颜色方案
+      const colorText = settings.colorScheme === 'red-green' ? '红涨绿跌' : '绿涨红跌';
+      document.getElementById('colorSchemeValue').textContent = colorText;
+
+      // 价格提醒
+      document.getElementById('priceAlertValue').textContent = settings.priceAlert ? '开启' : '关闭';
+
+      // 消息推送
+      document.getElementById('pushNotificationValue').textContent = settings.pushNotification ? '开启' : '关闭';
+    }
+
+    function updatePriceDisplay(precision) {
+      // 应用精度到价格显示
+      document.getElementById('price1').textContent = PRICE_DATA.price1.toFixed(precision);
+      document.getElementById('price2').textContent = PRICE_DATA.price2.toFixed(precision);
+      document.getElementById('price3').textContent = PRICE_DATA.price3.toFixed(precision);
+
+      addLog(`📊 价格精度已更新为 ${precision} 位小数`);
+    }
+
+    // 日志管理
+    function addLog(message) {
+      const logBox = document.getElementById('logBox');
+      const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      const logItem = document.createElement('div');
+      logItem.className = 'log-item';
+      logItem.textContent = `[${timestamp}] ${message}`;
+      logBox.appendChild(logItem);
+      
+      // 自动滚动到底部
+      logBox.scrollTop = logBox.scrollHeight;
+
+      // 限制日志条数
+      if (logBox.children.length > 50) {
+        logBox.removeChild(logBox.firstChild);
+      }
+    }
+
+    function clearLog() {
+      document.getElementById('logBox').innerHTML = '';
+      addLog('🗑️ 日志已清除');
+    }
+
+    // 操作函数
+    function openSettings() {
+      window.open('index.html', '_blank');
+      addLog('🔗 已打开设置页面（新标签）');
+    }
+
+    function refreshSettings() {
+      loadSettings();
+      updateDisplay();
+      addLog('🔄 手动刷新完成');
+    }
+
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

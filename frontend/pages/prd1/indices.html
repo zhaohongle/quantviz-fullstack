@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全球指数 + 实时资讯 - 量子财富智能交易平台</title>
+    <script src="../../js/refresh-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -544,6 +545,15 @@
 
         // ========== 初始化 ==========
         document.addEventListener('DOMContentLoaded', async () => {
+            // 初始化刷新管理器
+            RefreshManager.init({
+                onRefresh: async () => {
+                    const [indices, news] = await Promise.all([fetchIndices(), fetchNews()]);
+                    console.log('✅ 全球指数数据已刷新');
+                },
+                autoStart: true
+            });
+
             const [indices, news] = await Promise.all([fetchIndices(), fetchNews()]);
             console.log('✅ 数据加载完成');
         });

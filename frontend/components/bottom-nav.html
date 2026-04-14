@@ -1,0 +1,223 @@
+<!-- ========== 移动端底部导航栏组件 ========== -->
+<style>
+    /* ========== 底部导航栏 ========== */
+    .bottom-nav {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #FFFFFF;
+        border-top: 1px solid #E5E7EB;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+        padding-bottom: env(safe-area-inset-bottom); /* 支持 iPhone 刘海屏 */
+    }
+
+    .bottom-nav-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        max-width: 768px;
+        margin: 0 auto;
+        height: 64px;
+    }
+
+    .bottom-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 8px;
+        min-height: 56px;
+        min-width: 56px;
+        color: #6B7280;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .bottom-nav-item:active {
+        background-color: #F3F4F6;
+        border-radius: 8px;
+    }
+
+    .bottom-nav-item.active {
+        color: #1E3A8A;
+    }
+
+    .bottom-nav-icon {
+        font-size: 24px;
+        transition: transform 0.2s;
+    }
+
+    .bottom-nav-item.active .bottom-nav-icon {
+        transform: scale(1.1);
+    }
+
+    .bottom-nav-label {
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1;
+    }
+
+    .bottom-nav-item.active .bottom-nav-label {
+        font-weight: 600;
+    }
+
+    /* 激活指示器 */
+    .bottom-nav-indicator {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 3px;
+        background-color: #F59E0B;
+        border-radius: 0 0 3px 3px;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .bottom-nav-item.active .bottom-nav-indicator {
+        opacity: 1;
+    }
+
+    /* 徽章（通知数量） */
+    .bottom-nav-badge {
+        position: absolute;
+        top: 6px;
+        right: 50%;
+        transform: translateX(16px);
+        background-color: #EF4444;
+        color: #FFFFFF;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 10px;
+        min-width: 18px;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    /* ========== 响应式：仅移动端显示 ========== */
+    @media (max-width: 768px) {
+        .bottom-nav {
+            display: block;
+        }
+
+        /* 为底部导航栏留出空间 */
+        body {
+            padding-bottom: 64px;
+        }
+
+        .main-content {
+            padding-bottom: 80px; /* 额外空间防止内容被遮挡 */
+        }
+    }
+
+    /* iPhone X 及更新设备的安全区域适配 */
+    @supports (padding: max(0px)) {
+        .bottom-nav-container {
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+    }
+</style>
+
+<!-- 底部导航栏 -->
+<nav class="bottom-nav" id="bottomNav">
+    <div class="bottom-nav-container">
+        <a class="bottom-nav-item active" data-channel="home">
+            <div class="bottom-nav-indicator"></div>
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-label">首页</span>
+        </a>
+
+        <a class="bottom-nav-item" data-channel="recommendations">
+            <div class="bottom-nav-indicator"></div>
+            <span class="bottom-nav-icon">⭐</span>
+            <span class="bottom-nav-label">推荐</span>
+            <span class="bottom-nav-badge" id="recommendationsBadge">3</span>
+        </a>
+
+        <a class="bottom-nav-item" data-channel="search">
+            <div class="bottom-nav-indicator"></div>
+            <span class="bottom-nav-icon">🔍</span>
+            <span class="bottom-nav-label">搜索</span>
+        </a>
+
+        <a class="bottom-nav-item" data-channel="portfolio">
+            <div class="bottom-nav-indicator"></div>
+            <span class="bottom-nav-icon">💼</span>
+            <span class="bottom-nav-label">持仓</span>
+        </a>
+
+        <a class="bottom-nav-item" data-channel="profile">
+            <div class="bottom-nav-indicator"></div>
+            <span class="bottom-nav-icon">👤</span>
+            <span class="bottom-nav-label">我的</span>
+        </a>
+    </div>
+</nav>
+
+<script>
+(function() {
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item[data-channel]');
+
+    // 底部导航切换
+    bottomNavItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 移除所有激活状态
+            bottomNavItems.forEach(i => i.classList.remove('active'));
+            
+            // 添加当前激活状态
+            this.classList.add('active');
+            
+            // 触发频道切换
+            const channel = this.getAttribute('data-channel');
+            if (window.switchChannel) {
+                window.switchChannel(channel);
+            }
+
+            // 触觉反馈（如果支持）
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+        });
+    });
+
+    // 同步顶部导航和底部导航的激活状态
+    window.syncBottomNavActive = function(channel) {
+        bottomNavItems.forEach(item => {
+            if (item.getAttribute('data-channel') === channel) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    };
+
+    // 更新徽章数量
+    window.updateBottomNavBadge = function(channel, count) {
+        const item = document.querySelector(`.bottom-nav-item[data-channel="${channel}"]`);
+        if (item) {
+            let badge = item.querySelector('.bottom-nav-badge');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'bottom-nav-badge';
+                    item.appendChild(badge);
+                }
+                badge.textContent = count > 99 ? '99+' : count;
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+    };
+})();
+</script>

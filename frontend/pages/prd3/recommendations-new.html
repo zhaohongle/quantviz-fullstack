@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 精选推荐 - 量子财富智能交易平台</title>
+    <link rel="stylesheet" href="../../css/dark-theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background: var(--bg) !important;
+            color: var(--text) !important;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(59, 130, 246, 0.2));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            padding: 20px 32px;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        /* 风险偏好筛选器 */
+        .risk-filter {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .filter-btn.active {
+            background-color: #FFFFFF;
+            color: #1E3A8A;
+            border-color: #FFFFFF;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px 32px;
+        }
+
+        /* 快速统计栏 */
+        .quick-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-sec);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-link {
+            font-size: 13px;
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 4px;
+        }
+
+        .stat-link:hover {
+            color: var(--text);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--text-sec);
+        }
+
+        /* 推荐列表 */
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .stock-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .stock-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .stock-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stock-rank {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stock-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stock-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stock-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stock-code {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        .stock-sector {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .stock-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .rating-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .score-badge {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .price-section {
+            display: flex;
+            gap: 24px;
+            align-items: baseline;
+            margin-bottom: 12px;
+        }
+
+        .current-price {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .price-change {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .price-change.up { color: var(--up); }
+        .price-change.down { color: var(--down); }
+
+        .target-price {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        .target-price-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            color: var(--up);
+            font-weight: 600;
+        }
+
+        .reason-preview {
+            font-size: 14px;
+            color: var(--text-sec);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .highlights {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .highlight-tag {
+            padding: 4px 10px;
+            background: var(--primary-dim);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-detail-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-detail-btn:hover {
+            background: var(--text);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px 16px;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .quick-stats {
+                flex-direction: column;
+            }
+
+            .stock-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .stock-right {
+                align-items: flex-start;
+                flex-direction: row;
+                gap: 12px;
+            }
+
+            .price-section {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 AI 精选推荐</h1>
+        
+        <div class="risk-filter">
+            <button class="filter-btn" data-risk="low">🛡️ 保守型（低风险）</button>
+            <button class="filter-btn active" data-risk="medium">⚖️ 平衡型（中等风险）</button>
+            <button class="filter-btn" data-risk="high">🚀 激进型（高风险）</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 快速统计 -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-label">今日推荐</div>
+                <div class="stat-value" id="todayCount">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">30天准确率</div>
+                <div class="stat-value" id="accuracy30d">-</div>
+                <div class="stat-link" onclick="window.location.href='accuracy.html'">查看详细 →</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均收益率</div>
+                <div class="stat-value" style="color: #10B981;" id="avgReturn">-</div>
+            </div>
+        </div>
+
+        <!-- 加载中 -->
+        <div id="loading" class="loading">
+            加载中...
+        </div>
+
+        <!-- 推荐列表 -->
+        <div id="recommendationsList" class="recommendations-list" style="display: none;" data-error-boundary></div>
+    </div>
+
+    <!-- 错误处理系统 -->
+    <script src="../../js/error-handler.js"></script>
+    <script src="../../components/empty-state.html"></script>
+    <script src="../../components/error-boundary.html"></script>
+    
+    <!-- 刷新管理器 -->
+    <script src="../../js/refresh-manager.js"></script>
+
+    <script>
+        let currentRisk = 'medium';
+        let accuracyData = null;
+
+        // 初始化刷新管理器
+        RefreshManager.init({
+            onRefresh: async () => {
+                await loadAccuracyStats();
+                await loadRecommendations(currentRisk);
+            },
+            autoStart: true
+        });
+
+        // 初始化
+        loadAccuracyStats();
+        loadRecommendations(currentRisk);
+
+        // 风险偏好切换
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentRisk = btn.dataset.risk;
+                loadRecommendations(currentRisk);
+            });
+        });
+
+        // 加载准确率统计
+        async function loadAccuracyStats() {
+            try {
+                const API_BASE = getApiBase();
+                const data = await enhancedApiRequest(
+                    `recommendations/accuracy`,
+                    null,
+                    { maxRetries: 3 }
+                );
+                accuracyData = data;
+
+                document.getElementById('accuracy30d').textContent = `${accuracyData.overall.accuracy30d.toFixed(1)}%`;
+                document.getElementById('avgReturn').textContent = `+${accuracyData.overall.avgReturn}%`;
+            } catch (error) {
+                console.error('加载准确率失败:', error);
+                // 使用默认值
+                document.getElementById('accuracy30d').textContent = '--';
+                document.getElementById('avgReturn').textContent = '--';
+            }
+        }
+
+        // 加载推荐列表
+        async function loadRecommendations(risk) {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('recommendationsList').style.display = 'none';
+
+                const API_BASE = getApiBase();
+                const recommendations = await enhancedApiRequest(
+                    `recommendations?risk=${risk}`,
+                    [], // 降级数据
+                    { maxRetries: 3 }
+                );
+
+                // 更新统计
+                document.getElementById('todayCount').textContent = recommendations.length;
+
+                // 空状态检查
+                if (recommendations.length === 0) {
+                    document.getElementById('loading').style.display = 'none';
+                    EmptyState.show('recommendationsList', {
+                        type: 'no-recommendations'
+                    });
+                    document.getElementById('recommendationsList').style.display = 'block';
+                    return;
+                }
+
+                // 渲染推荐列表
+                const listContainer = document.getElementById('recommendationsList');
+                listContainer.innerHTML = recommendations.map((rec, index) => {
+                    const changeClass = rec.changePercent > 0 ? 'up' : 'down';
+                    const changeText = rec.changePercent > 0 ? `+${rec.changePercent.toFixed(2)}%` : `${rec.changePercent.toFixed(2)}%`;
+                    
+                    return `
+                        <div class="stock-card" onclick="viewDetail('${rec.code}')">
+                            <div class="stock-header">
+                                <div class="stock-left">
+                                    <div class="stock-rank">${index + 1}</div>
+                                    <div class="stock-info">
+                                        <div class="stock-name-row">
+                                            <span class="stock-name">${rec.name}</span>
+                                            <span class="stock-code">${rec.code}</span>
+                                        </div>
+                                        <span class="stock-sector">${rec.sector}</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="rating-badge" style="background-color: ${rec.ratingColor}">${rec.rating}</span>
+                                    <span class="score-badge">${rec.score} 分</span>
+                                </div>
+                            </div>
+
+                            <div class="price-section">
+                                <span class="current-price">¥${rec.currentPrice.toFixed(2)}</span>
+                                <span class="price-change ${changeClass}">${changeText}</span>
+                                <span class="target-price">目标价: <span class="target-price-value">¥${rec.targetPrice.toFixed(2)}</span></span>
+                            </div>
+
+                            <div class="reason-preview">
+                                ${rec.shortReason || rec.strategy}
+                            </div>
+
+                            <div class="highlights">
+                                ${rec.highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('loading').style.display = 'none';
+                listContainer.style.display = 'flex';
+
+            } catch (error) {
+                console.error('加载推荐失败:', error);
+                document.getElementById('loading').style.display = 'none';
+                
+                // 使用错误边界
+                ErrorBoundary.catch(error, 'recommendationsList', {
+                    title: 'AI 推荐加载失败',
+                    message: '无法获取推荐数据，请稍后重试'
+                });
+                
+                document.getElementById('recommendationsList').style.display = 'block';
+            }
+        }
+
+        function viewDetail(code) {
+            window.location.href = `recommendation-detail.html?code=${code}`;
+        }
+
+        function getApiBase() {
+            return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:3000'
+                : 'https://quantviz-fullstack-nkxq.vercel.app';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!-- 筛选器面板组件 -->
+<div class="filter-panel glass-card">
+  <div class="filter-header">
+    <h3>筛选条件</h3>
+    <button class="btn-ghost btn-sm reset-btn">重置</button>
+  </div>
+  
+  <div class="filter-body">
+    <!-- 板块筛选 -->
+    <div class="filter-section">
+      <label class="filter-label">板块</label>
+      <select class="filter-select" id="sector-filter">
+        <option value="">全部板块</option>
+        <option value="tech">科技</option>
+        <option value="finance">金融</option>
+        <option value="consumer">消费</option>
+        <option value="healthcare">医疗</option>
+        <option value="energy">能源</option>
+        <option value="materials">材料</option>
+      </select>
+    </div>
+    
+    <!-- 涨跌幅筛选 -->
+    <div class="filter-section">
+      <label class="filter-label">涨跌幅</label>
+      <div class="filter-range">
+        <input type="number" class="input-sm" placeholder="最小" id="change-min">
+        <span>~</span>
+        <input type="number" class="input-sm" placeholder="最大" id="change-max">
+      </div>
+    </div>
+    
+    <!-- 价格筛选 -->
+    <div class="filter-section">
+      <label class="filter-label">价格区间</label>
+      <div class="filter-range">
+        <input type="number" class="input-sm" placeholder="最小" id="price-min">
+        <span>~</span>
+        <input type="number" class="input-sm" placeholder="最大" id="price-max">
+      </div>
+    </div>
+    
+    <!-- 市值筛选 -->
+    <div class="filter-section">
+      <label class="filter-label">市值</label>
+      <div class="filter-checkbox-group">
+        <label class="filter-checkbox">
+          <input type="checkbox" value="large">
+          <span>大盘 (&gt;500亿)</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="mid">
+          <span>中盘 (100-500亿)</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="small">
+          <span>小盘 (&lt;100亿)</span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- 技术指标筛选 -->
+    <div class="filter-section">
+      <label class="filter-label">技术指标</label>
+      <div class="filter-checkbox-group">
+        <label class="filter-checkbox">
+          <input type="checkbox" value="macd-gold">
+          <span>MACD 金叉</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="kdj-oversold">
+          <span>KDJ 超卖</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="volume-spike">
+          <span>放量突破</span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- 排序 -->
+    <div class="filter-section">
+      <label class="filter-label">排序</label>
+      <select class="filter-select" id="sort-filter">
+        <option value="change-desc">涨幅从高到低</option>
+        <option value="change-asc">涨幅从低到高</option>
+        <option value="volume-desc">成交量从高到低</option>
+        <option value="price-desc">价格从高到低</option>
+        <option value="price-asc">价格从低到高</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="filter-footer">
+    <button class="btn btn-primary btn-block apply-btn">应用筛选</button>
+  </div>
+</div>
+
+<style>
+.filter-panel {
+  padding: 20px;
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.reset-btn {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+.filter-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sec);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.filter-select:focus {
+  border-color: var(--primary);
+}
+
+.filter-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-sm {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.input-sm:focus {
+  border-color: var(--primary);
+}
+
+.filter-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 13px;
+}
+
+.filter-checkbox:hover {
+  background: var(--bg-hover);
+}
+
+.filter-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.filter-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .filter-panel {
+    position: static;
+    max-height: none;
+  }
+}
+</style>
+
+<script>
+// 筛选器逻辑
+document.addEventListener('DOMContentLoaded', () => {
+  const applyBtn = document.querySelector('.apply-btn');
+  const resetBtn = document.querySelector('.reset-btn');
+  
+  if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+      const filters = {
+        sector: document.getElementById('sector-filter')?.value,
+        changeMin: document.getElementById('change-min')?.value,
+        changeMax: document.getElementById('change-max')?.value,
+        priceMin: document.getElementById('price-min')?.value,
+        priceMax: document.getElementById('price-max')?.value,
+        marketCap: Array.from(document.querySelectorAll('.filter-checkbox input[type="checkbox"]:checked'))
+          .map(cb => cb.value),
+        sort: document.getElementById('sort-filter')?.value
+      };
+      
+      // 触发筛选事件
+      window.dispatchEvent(new CustomEvent('filtersApplied', { detail: filters }));
+    });
+  }
+  
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      // 重置所有筛选器
+      document.querySelectorAll('.filter-select').forEach(select => {
+        select.selectedIndex = 0;
+      });
+      document.querySelectorAll('.input-sm').forEach(input => {
+        input.value = '';
+      });
+      document.querySelectorAll('.filter-checkbox input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      
+      // 触发重置事件
+      window.dispatchEvent(new Event('filtersReset'));
+    });
+  }
+});
+</script>

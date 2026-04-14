@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>量子财富智能交易平台</title>
+    
+    <!-- 暗黑主题系统 -->
+    <link rel="stylesheet" href="css/dark-theme.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    
+    <style>
+        /* ========== 全局重置 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background: var(--bg);
+        }
+
+        /* ========== 常驻顶部导航 ========== */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 32px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #7b61ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            user-select: none;
+        }
+
+        .nav-brand:hover {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+
+        .beta-tag {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--primary-dim);
+            color: var(--primary);
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            flex: 1;
+            margin: 0 40px;
+        }
+
+        .nav-item {
+            color: var(--text-sec);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition-fast);
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            color: var(--text);
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-sec);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ========== 面包屑导航 ========== */
+        .breadcrumb {
+            background: var(--bg-card);
+            padding: 12px 32px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .breadcrumb-inner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb-item {
+            color: var(--text-sec);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .breadcrumb-item:hover {
+            color: var(--primary);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text);
+            font-weight: 500;
+            cursor: default;
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-dim);
+            user-select: none;
+        }
+
+        /* ========== 主内容区 ========== */
+        #content {
+            min-height: calc(100vh - 120px);
+            position: relative;
+        }
+
+        /* ========== 加载状态 ========== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 14, 23, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(0, 212, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-sec);
+            font-size: 14px;
+        }
+
+        /* ========== 错误提示 ========== */
+        .error-toast {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            background: rgba(255, 59, 48, 0.95);
+            backdrop-filter: blur(16px);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(255, 59, 48, 0.3);
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+
+        .error-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ========== 内容切换动画 ========== */
+        #content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== 响应式适配 ========== */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 12px 16px;
+            }
+
+            .nav-items {
+                gap: 16px;
+                margin: 0 20px;
+            }
+
+            .nav-item {
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+
+            .breadcrumb {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+
+            .nav-brand {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 常驻顶部导航 -->
+    <nav class="top-nav">
+        <div class="top-nav-inner">
+            <div class="nav-brand" onclick="router.navigate('home')">
+                量子财富
+                <span class="beta-tag">BETA</span>
+            </div>
+            
+            <div class="nav-items" id="navItems">
+                <a class="nav-item active" data-channel="home">首页</a>
+                <a class="nav-item" data-channel="ai-recommendations">AI推荐</a>
+                <a class="nav-item" data-channel="smart-filter">智能筛选</a>
+                <a class="nav-item" data-channel="market-data">市场数据</a>
+                <a class="nav-item" data-channel="watchlist">自选股</a>
+                <a class="nav-item" data-channel="settings">设置</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="nav-btn" onclick="toggleSearch()">🔍</button>
+                <button class="nav-btn" onclick="toggleTheme()">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-inner" id="breadcrumbContainer">
+            <a class="breadcrumb-item" onclick="router.navigate('home')">首页</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">首页</span>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main id="content">
+        <!-- 内容动态加载 -->
+    </main>
+
+    <!-- 加载覆盖层 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">加载中...</div>
+        </div>
+    </div>
+
+    <!-- 错误提示 -->
+    <div class="error-toast" id="errorToast"></div>
+
+    <!-- 路由系统 -->
+    <script src="js/router.js"></script>
+    
+    <script>
+        // 初始化导航事件监听
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定导航项点击事件
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const channel = item.dataset.channel;
+                    router.navigate(channel);
+                });
+            });
+
+            // 加载默认首页
+            router.navigate('home');
+        });
+
+        // 搜索功能（占位）
+        function toggleSearch() {
+            console.log('搜索功能待实现');
+            // TODO: 实现全局搜索
+        }
+
+        // 主题切换（占位）
+        function toggleTheme() {
+            console.log('主题切换功能待实现');
+            // TODO: 实现明暗主题切换
+        }
+    </script>
+</body>
+</html>

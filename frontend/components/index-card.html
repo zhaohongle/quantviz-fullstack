@@ -1,0 +1,209 @@
+<!-- 指数卡片组件 -->
+<template id="index-card-template">
+  <div class="index-card glass-card">
+    <div class="index-header">
+      <span class="index-name"></span>
+      <span class="live-dot"></span>
+    </div>
+    
+    <div class="index-value"></div>
+    
+    <div class="index-change-row">
+      <span class="index-change"></span>
+      <span class="index-points"></span>
+    </div>
+    
+    <div class="index-range">
+      <span class="range-item">
+        <span class="range-label">高</span>
+        <span class="range-value high"></span>
+      </span>
+      <span class="range-item">
+        <span class="range-label">低</span>
+        <span class="range-value low"></span>
+      </span>
+    </div>
+    
+    <div class="index-sparkline">
+      <canvas class="sparkline-canvas"></canvas>
+    </div>
+  </div>
+</template>
+
+<style>
+.index-card {
+  padding: 18px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+}
+
+.index-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.index-name {
+  font-size: 13px;
+  color: var(--text-sec);
+  font-weight: 500;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--up);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.3);
+  }
+}
+
+.index-value {
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.index-change-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.index-change {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.index-points {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-sec);
+}
+
+.index-range {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+
+.range-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.range-label {
+  color: var(--text-sec);
+}
+
+.range-value {
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.index-sparkline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.sparkline-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* 涨跌样式 */
+.index-card.up {
+  border-color: rgba(0, 230, 118, 0.3);
+}
+
+.index-card.up .index-value,
+.index-card.up .index-change {
+  color: var(--up);
+}
+
+.index-card.down {
+  border-color: rgba(255, 82, 82, 0.3);
+}
+
+.index-card.down .index-value,
+.index-card.down .index-change {
+  color: var(--down);
+}
+
+.index-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .index-card {
+    min-height: 120px;
+    padding: 14px;
+  }
+  
+  .index-value {
+    font-size: 24px;
+  }
+  
+  .index-change {
+    font-size: 14px;
+  }
+}
+</style>
+
+<script>
+// 指数卡片工具函数
+function createIndexCard(data) {
+  const template = document.getElementById('index-card-template');
+  const clone = template.content.cloneNode(true);
+  
+  const card = clone.querySelector('.index-card');
+  card.classList.add(data.change >= 0 ? 'up' : 'down');
+  
+  clone.querySelector('.index-name').textContent = data.name;
+  clone.querySelector('.index-value').textContent = data.value.toFixed(2);
+  clone.querySelector('.index-change').textContent = 
+    `${data.change >= 0 ? '+' : ''}${data.changePercent.toFixed(2)}%`;
+  clone.querySelector('.index-points').textContent = 
+    `${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)}`;
+  clone.querySelector('.high').textContent = data.high.toFixed(2);
+  clone.querySelector('.low').textContent = data.low.toFixed(2);
+  
+  // 添加点击事件
+  card.addEventListener('click', () => {
+    // 切换到对应指数的详情视图
+    loadIndexDetail(data.code);
+  });
+  
+  return clone;
+}
+
+function loadIndexDetail(code) {
+  console.log('加载指数详情:', code);
+  // 实际项目中这里应该加载详细数据
+}
+</script>

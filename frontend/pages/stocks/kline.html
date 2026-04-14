@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K线分析 - 量子财富智能交易平台</title>
+    <link rel="stylesheet" href="../../css/dark-theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #0a0e27;
+            color: #E5E7EB;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 股票头部信息 */
+        .stock-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .stock-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stock-info {
+            flex: 1;
+        }
+
+        .stock-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .stock-code {
+            font-size: 16px;
+            color: #93C5FD;
+        }
+
+        .period-controls {
+            display: flex;
+            gap: 8px;
+            background-color: rgba(30, 58, 138, 0.5);
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        .period-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: transparent;
+            color: #93C5FD;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-btn.active {
+            background-color: #F59E0B;
+            color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+
+        .period-btn:hover:not(.active) {
+            background-color: rgba(147, 197, 253, 0.1);
+            color: #FFFFFF;
+        }
+
+        .stock-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #93C5FD;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .stat-value.up {
+            color: #EF4444;
+        }
+
+        .stat-value.down {
+            color: #10B981;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            background-color: #111827;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #F59E0B;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .indicator-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator-btn {
+            padding: 6px 12px;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            font-size: 12px;
+            background-color: #1F2937;
+            color: #9CA3AF;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .indicator-btn.active {
+            background-color: #3B82F6;
+            color: #FFFFFF;
+            border-color: #3B82F6;
+        }
+
+        .indicator-btn:hover:not(.active) {
+            border-color: #3B82F6;
+            color: #3B82F6;
+        }
+
+        /* ECharts 容器 */
+        #klineChart {
+            width: 100%;
+            height: 500px;
+        }
+
+        #volumeChart {
+            width: 100%;
+            height: 150px;
+        }
+
+        #indicatorChart {
+            width: 100%;
+            height: 200px;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            font-size: 16px;
+            color: #6B7280;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .stock-header {
+                padding: 16px;
+            }
+
+            .stock-name {
+                font-size: 22px;
+            }
+
+            .stock-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .period-controls {
+                flex-wrap: wrap;
+            }
+
+            .period-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            #klineChart {
+                height: 350px;
+            }
+
+            #indicatorChart {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-brand">📈 量子财富智能交易平台</div>
+        <div class="navbar-menu">
+            <a href="../prd1/index.html" class="nav-link">全球指数</a>
+            <a href="../prd2/sector.html" class="nav-link">板块资金流向</a>
+            <a href="../prd3/recommendations-new.html" class="nav-link">AI 精选推荐</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 股票头部 -->
+        <div class="stock-header">
+            <div class="stock-title-row">
+                <div class="stock-info">
+                    <div class="stock-name" id="stockName">上证指数</div>
+                    <div class="stock-code" id="stockCode">000001.SH</div>
+                </div>
+                <div class="period-controls">
+                    <button class="period-btn active" data-period="1d">日线</button>
+                    <button class="period-btn" data-period="1w">周线</button>
+                    <button class="period-btn" data-period="1M">月线</button>
+                </div>
+            </div>
+
+            <div class="stock-stats" id="stockStats">
+                <div class="stat-item">
+                    <div class="stat-label">最新价</div>
+                    <div class="stat-value" id="currentPrice">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">涨跌额</div>
+                    <div class="stat-value" id="changeAmount">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">涨跌幅</div>
+                    <div class="stat-value" id="changePercent">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">今开</div>
+                    <div class="stat-value" id="openPrice">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最高</div>
+                    <div class="stat-value" id="highPrice">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最低</div>
+                    <div class="stat-value" id="lowPrice">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- K线图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📊 K线图与均线</div>
+            </div>
+            <div id="klineChart" class="loading">加载K线数据</div>
+        </div>
+
+        <!-- 成交量 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📊 成交量</div>
+            </div>
+            <div id="volumeChart" class="loading">加载成交量数据</div>
+        </div>
+
+        <!-- 技术指标 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📈 技术指标</div>
+                <div class="indicator-selector">
+                    <button class="indicator-btn active" data-indicator="macd">MACD</button>
+                    <button class="indicator-btn" data-indicator="kdj">KDJ</button>
+                    <button class="indicator-btn" data-indicator="rsi">RSI</button>
+                    <button class="indicator-btn" data-indicator="boll">BOLL</button>
+                </div>
+            </div>
+            <div id="indicatorChart" class="loading">加载技术指标</div>
+        </div>
+    </div>
+
+    <!-- ECharts 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    
+    <!-- K线图核心逻辑 -->
+    <script src="kline-core.js"></script>
+    <script src="kline-indicators.js"></script>
+    <script src="kline-app.js"></script>
+</body>
+</html>

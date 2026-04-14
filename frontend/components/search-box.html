@@ -1,0 +1,405 @@
+<!-- ========================================
+     QuantViz 全局搜索框组件
+     支持：实时建议、拼音首字母、搜索历史
+     ========================================  -->
+
+<style>
+    /* ========== 搜索框容器 ========== */
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 500px;
+        margin: 0 20px;
+    }
+
+    .search-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 40px 10px 16px;
+        font-size: 14px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #FFFFFF;
+        outline: none;
+        transition: all 0.2s;
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .search-input:focus {
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 16px;
+        pointer-events: none;
+    }
+
+    /* ========== 搜索建议下拉框 ========== */
+    .search-suggestions {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: #FFFFFF;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 9999;
+        display: none;
+    }
+
+    .search-suggestions.show {
+        display: block;
+        animation: slideDown 0.2s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ========== 搜索建议项 ========== */
+    .suggestion-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-bottom: 1px solid #F3F4F6;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+        background: #F9FAFB;
+    }
+
+    .suggestion-item.history {
+        color: #6B7280;
+    }
+
+    .suggestion-info {
+        flex: 1;
+    }
+
+    .suggestion-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 2px;
+    }
+
+    .suggestion-code {
+        font-size: 12px;
+        color: #6B7280;
+        font-family: 'Courier New', monospace;
+    }
+
+    .suggestion-price {
+        text-align: right;
+        margin-left: 16px;
+    }
+
+    .price-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .price-change {
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    .price-change.up {
+        color: #DC2626;
+    }
+
+    .price-change.down {
+        color: #059669;
+    }
+
+    /* ========== 搜索历史 ========== */
+    .suggestions-section {
+        padding: 8px 0;
+    }
+
+    .section-title {
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6B7280;
+        text-transform: uppercase;
+    }
+
+    .clear-history-btn {
+        float: right;
+        color: #3B82F6;
+        cursor: pointer;
+        text-transform: none;
+        font-weight: 500;
+    }
+
+    .clear-history-btn:hover {
+        text-decoration: underline;
+    }
+
+    /* ========== 空状态 ========== */
+    .suggestions-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #9CA3AF;
+        font-size: 14px;
+    }
+
+    /* ========== 响应式：移动端 ========== */
+    @media (max-width: 768px) {
+        .search-container {
+            display: none; /* 移动端隐藏（可选） */
+        }
+    }
+</style>
+
+<!-- 搜索框HTML -->
+<div class="search-container" id="globalSearch">
+    <div class="search-input-wrapper">
+        <input 
+            type="text" 
+            class="search-input" 
+            id="searchInput"
+            placeholder="搜索股票代码/名称/拼音..."
+            autocomplete="off"
+        />
+        <span class="search-icon">🔍</span>
+    </div>
+
+    <!-- 搜索建议下拉框 -->
+    <div class="search-suggestions" id="searchSuggestions">
+        <!-- 动态内容由JS生成 -->
+    </div>
+</div>
+
+<script>
+    // ========== 全局搜索功能 ==========
+    (function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        
+        let debounceTimer = null;
+        const SEARCH_HISTORY_KEY = 'quantviz_search_history';
+        const MAX_HISTORY = 5;
+
+        // ========== 获取搜索历史 ==========
+        function getSearchHistory() {
+            try {
+                const history = localStorage.getItem(SEARCH_HISTORY_KEY);
+                return history ? JSON.parse(history) : [];
+            } catch {
+                return [];
+            }
+        }
+
+        // ========== 保存搜索历史 ==========
+        function saveSearchHistory(stock) {
+            try {
+                let history = getSearchHistory();
+                
+                // 去重（如果已存在，移到最前）
+                history = history.filter(item => item.code !== stock.code);
+                history.unshift(stock);
+                
+                // 限制数量
+                history = history.slice(0, MAX_HISTORY);
+                
+                localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+            } catch (error) {
+                console.error('保存搜索历史失败:', error);
+            }
+        }
+
+        // ========== 清空搜索历史 ==========
+        function clearSearchHistory() {
+            try {
+                localStorage.removeItem(SEARCH_HISTORY_KEY);
+                showSuggestions([], []);
+            } catch (error) {
+                console.error('清空搜索历史失败:', error);
+            }
+        }
+
+        // ========== 获取搜索建议 ==========
+        async function fetchSuggestions(query) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/search/suggestions?q=${encodeURIComponent(query)}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    return result.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('获取搜索建议失败:', error);
+                return [];
+            }
+        }
+
+        // ========== 显示搜索建议 ==========
+        function showSuggestions(suggestions, history = null) {
+            let html = '';
+
+            // 显示搜索历史（如果有）
+            if (history === null) {
+                history = getSearchHistory();
+            }
+
+            if (history.length > 0 && suggestions.length === 0) {
+                html += `
+                    <div class="suggestions-section">
+                        <div class="section-title">
+                            搜索历史
+                            <span class="clear-history-btn" onclick="window.clearSearchHistory()">清空</span>
+                        </div>
+                `;
+                history.forEach(item => {
+                    html += renderSuggestionItem(item, true);
+                });
+                html += '</div>';
+            }
+
+            // 显示搜索结果
+            if (suggestions.length > 0) {
+                html += '<div class="suggestions-section">';
+                suggestions.forEach(item => {
+                    html += renderSuggestionItem(item, false);
+                });
+                html += '</div>';
+            }
+
+            // 空状态
+            if (html === '') {
+                html = '<div class="suggestions-empty">未找到匹配的股票</div>';
+            }
+
+            searchSuggestions.innerHTML = html;
+            searchSuggestions.classList.add('show');
+        }
+
+        // ========== 渲染单个建议项 ==========
+        function renderSuggestionItem(item, isHistory) {
+            const changeClass = item.changePercent >= 0 ? 'up' : 'down';
+            const changeSymbol = item.changePercent >= 0 ? '+' : '';
+            
+            return `
+                <div class="suggestion-item ${isHistory ? 'history' : ''}" 
+                     data-code="${item.code}" 
+                     data-name="${item.name}"
+                     onclick="window.selectStock('${item.code}', '${item.name}', ${item.price}, ${item.changePercent})">
+                    <div class="suggestion-info">
+                        <div class="suggestion-name">${item.name}</div>
+                        <div class="suggestion-code">${item.market} ${item.code}</div>
+                    </div>
+                    <div class="suggestion-price">
+                        <div class="price-value">¥${item.price.toFixed(2)}</div>
+                        <div class="price-change ${changeClass}">
+                            ${changeSymbol}${item.changePercent.toFixed(2)}%
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== 隐藏搜索建议 ==========
+        function hideSuggestions() {
+            searchSuggestions.classList.remove('show');
+        }
+
+        // ========== 选择股票（跳转到详情页） ==========
+        window.selectStock = function(code, name, price, changePercent) {
+            // 保存到搜索历史
+            saveSearchHistory({
+                code,
+                name,
+                market: code.startsWith('6') ? 'SH' : 'SZ',
+                price,
+                changePercent
+            });
+
+            // 跳转到股票详情页（待开发）
+            // window.location.href = `pages/stocks/detail.html?code=${code}`;
+            
+            // 临时：跳转到搜索结果页
+            window.location.href = `pages/search/index.html?q=${encodeURIComponent(name)}`;
+        };
+
+        // 暴露清空历史函数到全局（供内联onclick使用）
+        window.clearSearchHistory = clearSearchHistory;
+
+        // ========== 输入事件监听 ==========
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+
+            // 清除之前的定时器
+            clearTimeout(debounceTimer);
+
+            if (query.length === 0) {
+                // 显示搜索历史
+                showSuggestions([], getSearchHistory());
+                return;
+            }
+
+            // 防抖：300ms后发送请求
+            debounceTimer = setTimeout(async () => {
+                const suggestions = await fetchSuggestions(query);
+                showSuggestions(suggestions);
+            }, 300);
+        });
+
+        // ========== 聚焦时显示历史 ==========
+        searchInput.addEventListener('focus', () => {
+            if (searchInput.value.trim() === '') {
+                showSuggestions([], getSearchHistory());
+            }
+        });
+
+        // ========== 点击外部隐藏建议 ==========
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#globalSearch')) {
+                hideSuggestions();
+            }
+        });
+
+        // ========== 回车跳转到搜索结果页 ==========
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `pages/search/index.html?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    })();
+</script>

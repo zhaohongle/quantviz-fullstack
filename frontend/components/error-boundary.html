@@ -1,0 +1,441 @@
+<!-- ========== QuantViz 错误边界组件 ========== -->
+<!-- 
+    使用方式：
+    1. 在页面中引入：<script src="/components/error-boundary.html"></script>
+    2. 包裹内容区域：
+       <div id="main-content" data-error-boundary>
+           <!-- 你的内容 -->
+       </div>
+    3. 手动触发：ErrorBoundary.catch(error, 'main-content')
+-->
+
+<style>
+    .error-boundary {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 32px;
+        text-align: center;
+        background-color: #FEF2F2;
+        border: 2px dashed #DC2626;
+        border-radius: 8px;
+        min-height: 400px;
+        margin: 20px;
+    }
+
+    .error-boundary-icon {
+        font-size: 72px;
+        margin-bottom: 24px;
+        animation: errorShake 0.5s ease-in-out;
+    }
+
+    .error-boundary-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #991B1B;
+        margin-bottom: 12px;
+    }
+
+    .error-boundary-message {
+        font-size: 16px;
+        color: #DC2626;
+        line-height: 1.6;
+        max-width: 500px;
+        margin-bottom: 24px;
+    }
+
+    .error-boundary-details {
+        width: 100%;
+        max-width: 800px;
+        margin-top: 24px;
+    }
+
+    .error-boundary-details summary {
+        font-size: 14px;
+        font-weight: 600;
+        color: #991B1B;
+        cursor: pointer;
+        padding: 12px;
+        background-color: #FEE2E2;
+        border-radius: 6px;
+        user-select: none;
+        transition: background-color 0.2s;
+    }
+
+    .error-boundary-details summary:hover {
+        background-color: #FECACA;
+    }
+
+    .error-boundary-details pre {
+        margin-top: 12px;
+        padding: 16px;
+        background-color: #450A0A;
+        color: #FEE2E2;
+        border-radius: 6px;
+        overflow-x: auto;
+        text-align: left;
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .error-boundary-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 24px;
+    }
+
+    .error-boundary-btn {
+        padding: 12px 28px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        border: none;
+    }
+
+    .error-boundary-btn-primary {
+        background-color: #DC2626;
+        color: #FFFFFF;
+    }
+
+    .error-boundary-btn-primary:hover {
+        background-color: #B91C1C;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    .error-boundary-btn-secondary {
+        background-color: #FFFFFF;
+        color: #DC2626;
+        border: 2px solid #DC2626;
+    }
+
+    .error-boundary-btn-secondary:hover {
+        background-color: #FEE2E2;
+    }
+
+    .error-boundary-tips {
+        margin-top: 32px;
+        padding: 20px;
+        background-color: #FEF3C7;
+        border-left: 4px solid #F59E0B;
+        border-radius: 6px;
+        max-width: 600px;
+        text-align: left;
+    }
+
+    .error-boundary-tips-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #92400E;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .error-boundary-tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .error-boundary-tips-list li {
+        font-size: 13px;
+        color: #78350F;
+        padding: 4px 0;
+        padding-left: 20px;
+        position: relative;
+    }
+
+    .error-boundary-tips-list li:before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: #F59E0B;
+        font-weight: bold;
+    }
+
+    @keyframes errorShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px) rotate(-5deg); }
+        75% { transform: translateX(10px) rotate(5deg); }
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .error-boundary {
+            padding: 48px 24px;
+            min-height: 300px;
+            margin: 10px;
+        }
+
+        .error-boundary-icon {
+            font-size: 56px;
+        }
+
+        .error-boundary-title {
+            font-size: 20px;
+        }
+
+        .error-boundary-message {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<script>
+// ========== 错误边界组件 ==========
+const ErrorBoundary = {
+    // 配置
+    config: {
+        isDevelopment: window.location.hostname === 'localhost',
+        showStackTrace: true,
+        autoReport: false // 未来可接入错误上报服务
+    },
+
+    // 已捕获的边界
+    boundaries: new Map(),
+
+    /**
+     * 初始化错误边界
+     */
+    init() {
+        // 自动为带 data-error-boundary 的元素设置边界
+        document.querySelectorAll('[data-error-boundary]').forEach(element => {
+            this.wrap(element.id || this.generateId(element));
+        });
+
+        console.log('[ErrorBoundary] 初始化完成');
+    },
+
+    /**
+     * 包裹容器为错误边界
+     */
+    wrap(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            console.error(`[ErrorBoundary] 容器不存在: #${containerId}`);
+            return;
+        }
+
+        // 保存原始内容
+        this.boundaries.set(containerId, {
+            originalContent: container.innerHTML,
+            hasError: false
+        });
+
+        console.log(`[ErrorBoundary] 已包裹: #${containerId}`);
+    },
+
+    /**
+     * 捕获并显示错误
+     */
+    catch(error, containerId, options = {}) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            console.error(`[ErrorBoundary] 容器不存在: #${containerId}`);
+            return;
+        }
+
+        const boundary = this.boundaries.get(containerId);
+        if (boundary) {
+            boundary.hasError = true;
+        }
+
+        const {
+            title = this.config.isDevelopment ? '组件错误' : '页面加载失败',
+            message = this.getErrorMessage(error),
+            showDetails = this.config.isDevelopment && this.config.showStackTrace,
+            showTips = !this.config.isDevelopment
+        } = options;
+
+        // 渲染错误 UI
+        container.innerHTML = `
+            <div class="error-boundary">
+                <div class="error-boundary-icon">💥</div>
+                <div class="error-boundary-title">${title}</div>
+                <div class="error-boundary-message">${message}</div>
+                
+                <div class="error-boundary-actions">
+                    <button class="error-boundary-btn error-boundary-btn-primary" onclick="ErrorBoundary.recover('${containerId}')">
+                        🔄 重新加载
+                    </button>
+                    <a href="/index-new.html" class="error-boundary-btn error-boundary-btn-secondary">
+                        🏠 返回首页
+                    </a>
+                </div>
+
+                ${showDetails ? `
+                    <details class="error-boundary-details">
+                        <summary>📋 查看错误详情（开发模式）</summary>
+                        <pre>${this.formatError(error)}</pre>
+                    </details>
+                ` : ''}
+
+                ${showTips ? `
+                    <div class="error-boundary-tips">
+                        <div class="error-boundary-tips-title">
+                            💡 遇到问题了？
+                        </div>
+                        <ul class="error-boundary-tips-list">
+                            <li>尝试刷新页面</li>
+                            <li>检查网络连接</li>
+                            <li>清除浏览器缓存</li>
+                            <li>如果问题持续，请联系技术支持</li>
+                        </ul>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        // 日志记录
+        console.error(`[ErrorBoundary] 捕获错误 [${containerId}]:`, error);
+
+        // 自动上报（如果启用）
+        if (this.config.autoReport) {
+            this.report(error, containerId);
+        }
+    },
+
+    /**
+     * 恢复错误边界
+     */
+    recover(containerId) {
+        const container = document.getElementById(containerId);
+        const boundary = this.boundaries.get(containerId);
+
+        if (!container || !boundary) {
+            console.error(`[ErrorBoundary] 无法恢复: #${containerId}`);
+            return;
+        }
+
+        // 恢复原始内容
+        container.innerHTML = boundary.originalContent;
+        boundary.hasError = false;
+
+        console.log(`[ErrorBoundary] 已恢复: #${containerId}`);
+
+        // 触发自定义事件
+        container.dispatchEvent(new CustomEvent('error-boundary-recovered'));
+
+        // 刷新页面（备选方案）
+        location.reload();
+    },
+
+    /**
+     * 获取友好的错误消息
+     */
+    getErrorMessage(error) {
+        if (!error) return '发生未知错误';
+
+        const message = error.message || String(error);
+
+        // 常见错误模式
+        if (message.includes('fetch') || message.includes('network')) {
+            return '网络请求失败，请检查网络连接';
+        }
+        if (message.includes('JSON')) {
+            return '数据格式错误';
+        }
+        if (message.includes('undefined') || message.includes('null')) {
+            return '数据缺失或格式不正确';
+        }
+        if (message.includes('permission')) {
+            return '权限不足';
+        }
+
+        // 开发模式显示原始消息，生产模式显示通用消息
+        return this.config.isDevelopment 
+            ? message 
+            : '页面加载时出现错误，请刷新重试';
+    },
+
+    /**
+     * 格式化错误信息
+     */
+    formatError(error) {
+        if (!error) return 'Unknown error';
+
+        let output = '';
+
+        // 错误消息
+        output += `Error: ${error.message || error}\n\n`;
+
+        // 堆栈跟踪
+        if (error.stack) {
+            output += `Stack Trace:\n${error.stack}`;
+        }
+
+        // 错误对象详情
+        if (typeof error === 'object') {
+            output += `\n\nError Object:\n${JSON.stringify(error, null, 2)}`;
+        }
+
+        return output;
+    },
+
+    /**
+     * 上报错误（预留接口）
+     */
+    report(error, containerId) {
+        // TODO: 接入错误监控服务（如 Sentry）
+        console.log('[ErrorBoundary] 错误上报:', {
+            error: error.message,
+            stack: error.stack,
+            containerId,
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        });
+    },
+
+    /**
+     * 生成唯一 ID
+     */
+    generateId(element) {
+        const id = `error-boundary-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        element.id = id;
+        return id;
+    },
+
+    /**
+     * 检查容器是否有错误
+     */
+    hasError(containerId) {
+        const boundary = this.boundaries.get(containerId);
+        return boundary ? boundary.hasError : false;
+    },
+
+    /**
+     * 清除错误状态
+     */
+    clearError(containerId) {
+        const boundary = this.boundaries.get(containerId);
+        if (boundary) {
+            boundary.hasError = false;
+        }
+    }
+};
+
+// ========== 自动初始化 ==========
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        ErrorBoundary.init();
+    });
+} else {
+    ErrorBoundary.init();
+}
+
+// ========== 导出 ==========
+window.ErrorBoundary = ErrorBoundary;
+</script>

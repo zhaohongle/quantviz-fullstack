@@ -1,0 +1,311 @@
+<!-- ========== QuantViz 空状态组件 ========== -->
+<!-- 
+    使用方式：
+    <div id="empty-container"></div>
+    <script>
+        EmptyState.show('empty-container', {
+            type: 'no-data',
+            message: '暂无数据',
+            action: { text: '刷新', onClick: () => location.reload() }
+        });
+    </script>
+-->
+
+<style>
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 32px;
+        text-align: center;
+        background-color: #FFFFFF;
+        border-radius: 8px;
+        border: 1px solid #E5E7EB;
+        min-height: 400px;
+    }
+
+    .empty-state-icon {
+        font-size: 72px;
+        margin-bottom: 24px;
+        opacity: 0.6;
+        animation: emptyStateFadeIn 0.6s ease-out;
+    }
+
+    .empty-state-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 12px;
+    }
+
+    .empty-state-message {
+        font-size: 15px;
+        color: #6B7280;
+        line-height: 1.6;
+        max-width: 400px;
+        margin-bottom: 24px;
+    }
+
+    .empty-state-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .empty-state-btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .empty-state-btn-primary {
+        background-color: #1E3A8A;
+        color: #FFFFFF;
+        border: none;
+    }
+
+    .empty-state-btn-primary:hover {
+        background-color: #1E40AF;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(30, 58, 138, 0.2);
+    }
+
+    .empty-state-btn-secondary {
+        background-color: #FFFFFF;
+        color: #1E3A8A;
+        border: 1px solid #1E3A8A;
+    }
+
+    .empty-state-btn-secondary:hover {
+        background-color: #F3F4F6;
+    }
+
+    .empty-state-tips {
+        margin-top: 32px;
+        padding: 16px;
+        background-color: #F9FAFB;
+        border-radius: 8px;
+        max-width: 500px;
+    }
+
+    .empty-state-tips-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .empty-state-tips-list li {
+        font-size: 13px;
+        color: #6B7280;
+        padding: 6px 0;
+        padding-left: 24px;
+        position: relative;
+    }
+
+    .empty-state-tips-list li:before {
+        content: '💡';
+        position: absolute;
+        left: 0;
+    }
+
+    @keyframes emptyStateFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 0.6;
+            transform: translateY(0);
+        }
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .empty-state {
+            padding: 48px 24px;
+            min-height: 300px;
+        }
+
+        .empty-state-icon {
+            font-size: 56px;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+        }
+
+        .empty-state-message {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<script>
+// ========== 空状态组件 ==========
+const EmptyState = {
+    // 预设类型
+    templates: {
+        'no-data': {
+            icon: '📭',
+            title: '暂无数据',
+            message: '当前没有可显示的内容',
+            actions: []
+        },
+        'no-stocks': {
+            icon: '📊',
+            title: '还没有自选股',
+            message: '添加你关注的股票，随时追踪行情变化',
+            actions: [
+                { text: '添加自选股', primary: true, href: '/pages/prd1/watchlist-new.html' },
+                { text: '浏览推荐', href: '/pages/prd3/recommendations-new.html' }
+            ],
+            tips: {
+                title: '使用建议',
+                items: [
+                    '点击股票搜索框，输入股票代码或名称',
+                    '在股票详情页点击"加自选"按钮',
+                    '从首页的热门股票中快速添加'
+                ]
+            }
+        },
+        'no-recommendations': {
+            icon: '🤖',
+            title: '暂无推荐内容',
+            message: 'AI 正在分析市场，稍后会为你推荐优质股票',
+            actions: [
+                { text: '查看自选股', href: '/pages/prd1/watchlist-new.html' },
+                { text: '浏览排行榜', href: '/pages/prd5/ranking-new.html' }
+            ]
+        },
+        'no-news': {
+            icon: '📰',
+            title: '暂无最新资讯',
+            message: '目前没有新的财经新闻',
+            actions: [
+                { text: '刷新页面', primary: true, onClick: () => location.reload() }
+            ]
+        },
+        'no-search-results': {
+            icon: '🔍',
+            title: '未找到匹配结果',
+            message: '试试其他关键词或调整筛选条件',
+            actions: [
+                { text: '清空搜索', primary: true, onClick: null } // onClick 由调用方设置
+            ]
+        },
+        'network-error': {
+            icon: '🌐',
+            title: '网络连接失败',
+            message: '无法加载数据，请检查网络连接后重试',
+            actions: [
+                { text: '重新加载', primary: true, onClick: () => location.reload() }
+            ]
+        },
+        'server-error': {
+            icon: '⚠️',
+            title: '服务器错误',
+            message: '服务暂时不可用，我们正在紧急修复',
+            actions: [
+                { text: '返回首页', href: '/index-new.html' },
+                { text: '稍后重试', primary: true, onClick: () => location.reload() }
+            ]
+        }
+    },
+
+    /**
+     * 显示空状态
+     * @param {string} containerId - 容器 ID
+     * @param {Object} options - 配置选项
+     */
+    show(containerId, options = {}) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            console.error(`[EmptyState] 容器不存在: #${containerId}`);
+            return;
+        }
+
+        // 合并预设模板和自定义选项
+        const config = options.type && this.templates[options.type]
+            ? { ...this.templates[options.type], ...options }
+            : options;
+
+        const {
+            icon = '📭',
+            title = '暂无内容',
+            message = '',
+            actions = [],
+            tips = null
+        } = config;
+
+        // 渲染 HTML
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">${icon}</div>
+                <div class="empty-state-title">${title}</div>
+                ${message ? `<div class="empty-state-message">${message}</div>` : ''}
+                ${actions.length > 0 ? `
+                    <div class="empty-state-actions">
+                        ${actions.map((action, index) => {
+                            const btnClass = action.primary ? 'empty-state-btn-primary' : 'empty-state-btn-secondary';
+                            const tag = action.href ? 'a' : 'button';
+                            const href = action.href ? `href="${action.href}"` : '';
+                            const id = `empty-action-${index}`;
+                            return `<${tag} ${href} id="${id}" class="empty-state-btn ${btnClass}">${action.text}</${tag}>`;
+                        }).join('')}
+                    </div>
+                ` : ''}
+                ${tips ? `
+                    <div class="empty-state-tips">
+                        <div class="empty-state-tips-title">${tips.title}</div>
+                        <ul class="empty-state-tips-list">
+                            ${tips.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        // 绑定事件
+        actions.forEach((action, index) => {
+            if (action.onClick) {
+                const btn = document.getElementById(`empty-action-${index}`);
+                if (btn) {
+                    btn.addEventListener('click', (e) => {
+                        if (!action.href) {
+                            e.preventDefault();
+                        }
+                        action.onClick(e);
+                    });
+                }
+            }
+        });
+    },
+
+    /**
+     * 隐藏空状态
+     */
+    hide(containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '';
+        }
+    }
+};
+
+// 导出到全局
+window.EmptyState = EmptyState;
+</script>

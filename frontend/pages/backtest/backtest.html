@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>回测系统 - QuantViz</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    .backtest-container {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .backtest-params {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .param-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .param-input {
+      flex: 1;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+    }
+
+    .run-backtest-btn {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+    }
+
+    .backtest-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .result-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .result-value {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    .chart-container {
+      height: 400px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .recommendation-history {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .history-item {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <div class="backtest-container">
+    <h1>🔄 回测系统</h1>
+    
+    <div class="backtest-params">
+      <h2>回测参数</h2>
+      <div class="param-row">
+        <input type="date" class="param-input" id="startDate" value="2024-01-01">
+        <input type="date" class="param-input" id="endDate" value="2024-12-31">
+      </div>
+      <div class="param-row">
+        <input type="number" class="param-input" id="initialCapital" placeholder="初始资金" value="100000">
+        <select class="param-input" id="strategy">
+          <option value="ai">AI 推荐策略</option>
+          <option value="momentum">动量策略</option>
+          <option value="value">价值投资策略</option>
+        </select>
+      </div>
+      <button class="run-backtest-btn" onclick="runBacktest()">运行回测</button>
+    </div>
+
+    <div id="backtestResults" class="backtest-results"></div>
+    <div id="profitChart" class="chart-container"></div>
+    
+    <div class="recommendation-history">
+      <h2>历史推荐记录</h2>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <script src="../../js/api-integration.js"></script>
+  <script>
+    function runBacktest() {
+      const params = {
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        initialCapital: parseFloat(document.getElementById('initialCapital').value),
+        strategy: document.getElementById('strategy').value
+      };
+
+      // 模拟回测结果
+      const results = {
+        totalReturn: 25.6,
+        annualReturn: 18.3,
+        maxDrawdown: -8.5,
+        sharpeRatio: 1.82,
+        winRate: 68.4,
+        totalTrades: 47
+      };
+
+      displayResults(results);
+      drawProfitChart(params);
+      loadRecommendationHistory();
+    }
+
+    function displayResults(results) {
+      const html = `
+        <div class="result-card">
+          <div class="result-label">总收益率</div>
+          <div class="result-value" style="color: #34c759;">+${results.totalReturn}%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">年化收益率</div>
+          <div class="result-value">${results.annualReturn}%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">最大回撤</div>
+          <div class="result-value" style="color: #ff3b30;">${results.maxDrawdown}%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">夏普比率</div>
+          <div class="result-value">${results.sharpeRatio}</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">胜率</div>
+          <div class="result-value">${results.winRate}%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">总交易次数</div>
+          <div class="result-value">${results.totalTrades}</div>
+        </div>
+      `;
+
+      document.getElementById('backtestResults').innerHTML = html;
+    }
+
+    function drawProfitChart(params) {
+      const chart = echarts.init(document.getElementById('profitChart'));
+      
+      const dates = Array.from({length: 365}, (_, i) => {
+        const d = new Date(params.startDate);
+        d.setDate(d.getDate() + i);
+        return d.toLocaleDateString();
+      });
+
+      const profitData = dates.map((_, i) => {
+        return params.initialCapital * (1 + (0.256 * i / 365) + (Math.random() - 0.5) * 0.05);
+      });
+
+      chart.setOption({
+        title: { text: '收益曲线', textStyle: { color: '#fff' } },
+        tooltip: { trigger: 'axis' },
+        xAxis: {
+          type: 'category',
+          data: dates,
+          axisLabel: { color: '#fff', interval: 60 }
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: { 
+            color: '#fff',
+            formatter: (value) => '¥' + (value / 10000).toFixed(1) + 'w'
+          }
+        },
+        series: [{
+          name: '账户资金',
+          type: 'line',
+          data: profitData,
+          smooth: true,
+          lineStyle: { color: '#34c759', width: 2 },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(52, 199, 89, 0.3)' },
+                { offset: 1, color: 'rgba(52, 199, 89, 0)' }
+              ]
+            }
+          }
+        }]
+      });
+    }
+
+    function loadRecommendationHistory() {
+      const history = [
+        { date: '2024-04-10', stock: '贵州茅台', code: '600519', action: '买入', price: 1680, result: '+5.2%', status: 'win' },
+        { date: '2024-04-08', stock: '宁德时代', code: '300750', action: '卖出', price: 185, result: '+12.6%', status: 'win' },
+        { date: '2024-04-05', stock: '隆基绿能', code: '601012', action: '持有', price: 22.5, result: '-2.3%', status: 'loss' },
+        { date: '2024-04-03', stock: '比亚迪', code: '002594', action: '买入', price: 205, result: '+8.9%', status: 'win' }
+      ];
+
+      const html = history.map(item => `
+        <div class="history-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${item.stock}</strong> (${item.code})
+              <span style="color: #888; margin-left: 1rem;">${item.date}</span>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.9rem; color: #888;">${item.action} @ ¥${item.price}</div>
+              <div style="font-size: 1.1rem; color: ${item.status === 'win' ? '#34c759' : '#ff3b30'};">
+                ${item.result}
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('historyList').innerHTML = html;
+
+      // 计算准确率
+      const winCount = history.filter(h => h.status === 'win').length;
+      const accuracy = (winCount / history.length * 100).toFixed(1);
+
+      document.querySelector('.recommendation-history h2').innerHTML = `
+        历史推荐记录 
+        <span style="color: #34c759; font-size: 0.9rem; margin-left: 1rem;">
+          准确率: ${accuracy}%
+        </span>
+      `;
+    }
+
+    // 页面加载时显示示例数据
+    window.addEventListener('DOMContentLoaded', () => {
+      runBacktest();
+    });
+  </script>
+</body>
+</html>

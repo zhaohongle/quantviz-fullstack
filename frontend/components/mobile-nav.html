@@ -1,0 +1,387 @@
+<!-- ========== 移动端导航组件 ========== -->
+<style>
+    /* ========== 移动端汉堡菜单按钮 ========== */
+    .mobile-menu-btn {
+        display: none;
+        background: transparent;
+        border: none;
+        color: #FFFFFF;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 8px;
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background 0.2s;
+    }
+
+    .mobile-menu-btn:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .mobile-menu-btn:active {
+        background: rgba(255,255,255,0.2);
+    }
+
+    /* ========== 移动端侧边栏抽屉菜单 ========== */
+    .mobile-sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .mobile-sidebar-overlay.show {
+        display: block;
+        opacity: 1;
+    }
+
+    .mobile-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background-color: #FFFFFF;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 2000;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .mobile-sidebar.show {
+        display: block;
+        transform: translateX(0);
+    }
+
+    /* 侧边栏头部 */
+    .mobile-sidebar-header {
+        background-color: #1E3A8A;
+        color: #FFFFFF;
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .mobile-sidebar-brand {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .mobile-sidebar-close {
+        background: none;
+        border: none;
+        color: #FFFFFF;
+        font-size: 24px;
+        cursor: pointer;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background 0.2s;
+    }
+
+    .mobile-sidebar-close:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    /* 用户信息区域 */
+    .mobile-sidebar-user {
+        padding: 20px 16px;
+        border-bottom: 1px solid #E5E7EB;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .mobile-user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #F59E0B;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 600;
+        color: #FFFFFF;
+    }
+
+    .mobile-user-info {
+        flex: 1;
+    }
+
+    .mobile-user-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .mobile-user-email {
+        font-size: 13px;
+        color: #6B7280;
+    }
+
+    /* 菜单列表 */
+    .mobile-sidebar-menu {
+        padding: 8px 0;
+    }
+
+    .mobile-menu-item {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        color: #374151;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+        min-height: 48px;
+        gap: 12px;
+    }
+
+    .mobile-menu-item:hover {
+        background-color: #F3F4F6;
+        color: #1E3A8A;
+    }
+
+    .mobile-menu-item.active {
+        background-color: #EFF6FF;
+        color: #1E3A8A;
+        border-left-color: #F59E0B;
+        font-weight: 600;
+    }
+
+    .mobile-menu-item-icon {
+        font-size: 20px;
+        width: 24px;
+        text-align: center;
+    }
+
+    .mobile-menu-divider {
+        height: 1px;
+        background-color: #E5E7EB;
+        margin: 8px 0;
+    }
+
+    /* 侧边栏底部操作 */
+    .mobile-sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid #E5E7EB;
+        position: sticky;
+        bottom: 0;
+        background-color: #FFFFFF;
+    }
+
+    .mobile-footer-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #F3F4F6;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+        min-height: 44px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .mobile-footer-btn:hover {
+        background-color: #E5E7EB;
+    }
+
+    /* ========== 响应式：仅移动端显示 ========== */
+    @media (max-width: 768px) {
+        .mobile-menu-btn {
+            display: flex;
+        }
+
+        /* 隐藏桌面导航 */
+        .navbar-center {
+            display: none !important;
+        }
+    }
+
+    /* 防止侧边栏打开时页面滚动 */
+    body.mobile-menu-open {
+        overflow: hidden;
+    }
+</style>
+
+<!-- 移动端侧边栏遮罩层 -->
+<div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
+
+<!-- 移动端侧边栏 -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <!-- 头部 -->
+    <div class="mobile-sidebar-header">
+        <div class="mobile-sidebar-brand">QuantViz</div>
+        <button class="mobile-sidebar-close" id="mobileSidebarClose">✕</button>
+    </div>
+
+    <!-- 用户信息 -->
+    <div class="mobile-sidebar-user">
+        <div class="mobile-user-avatar">Q</div>
+        <div class="mobile-user-info">
+            <div class="mobile-user-name">量子用户</div>
+            <div class="mobile-user-email">未登录</div>
+        </div>
+    </div>
+
+    <!-- 菜单列表 -->
+    <div class="mobile-sidebar-menu">
+        <a class="mobile-menu-item active" data-channel="home">
+            <span class="mobile-menu-item-icon">🏠</span>
+            <span>首页</span>
+        </a>
+        <a class="mobile-menu-item" data-channel="indices">
+            <span class="mobile-menu-item-icon">🌍</span>
+            <span>全球指数</span>
+        </a>
+        <a class="mobile-menu-item" data-channel="sectors">
+            <span class="mobile-menu-item-icon">📊</span>
+            <span>板块资金流</span>
+        </a>
+        <a class="mobile-menu-item" data-channel="recommendations">
+            <span class="mobile-menu-item-icon">🤖</span>
+            <span>AI 推荐</span>
+        </a>
+
+        <div class="mobile-menu-divider"></div>
+
+        <a class="mobile-menu-item" data-channel="portfolio">
+            <span class="mobile-menu-item-icon">💼</span>
+            <span>我的持仓</span>
+        </a>
+        <a class="mobile-menu-item" data-channel="watchlist">
+            <span class="mobile-menu-item-icon">⭐</span>
+            <span>自选股</span>
+        </a>
+        <a class="mobile-menu-item" data-channel="alerts">
+            <span class="mobile-menu-item-icon">🔔</span>
+            <span>价格提醒</span>
+        </a>
+
+        <div class="mobile-menu-divider"></div>
+
+        <a class="mobile-menu-item" data-channel="settings">
+            <span class="mobile-menu-item-icon">⚙️</span>
+            <span>设置</span>
+        </a>
+        <a class="mobile-menu-item" data-channel="help">
+            <span class="mobile-menu-item-icon">❓</span>
+            <span>帮助中心</span>
+        </a>
+    </div>
+
+    <!-- 底部操作 -->
+    <div class="mobile-sidebar-footer">
+        <button class="mobile-footer-btn" id="mobileThemeToggle">
+            <span>🌙</span>
+            <span>切换主题</span>
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    const mobileSidebarClose = document.getElementById('mobileSidebarClose');
+    const mobileMenuItems = document.querySelectorAll('.mobile-menu-item[data-channel]');
+
+    // 打开侧边栏
+    function openMobileSidebar() {
+        mobileSidebar.classList.add('show');
+        mobileSidebarOverlay.classList.add('show');
+        document.body.classList.add('mobile-menu-open');
+    }
+
+    // 关闭侧边栏
+    function closeMobileSidebar() {
+        mobileSidebar.classList.remove('show');
+        mobileSidebarOverlay.classList.remove('show');
+        document.body.classList.remove('mobile-menu-open');
+    }
+
+    // 切换侧边栏
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', openMobileSidebar);
+    }
+
+    // 关闭按钮
+    if (mobileSidebarClose) {
+        mobileSidebarClose.addEventListener('click', closeMobileSidebar);
+    }
+
+    // 点击遮罩层关闭
+    if (mobileSidebarOverlay) {
+        mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
+    }
+
+    // 菜单项点击
+    mobileMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 移除所有激活状态
+            mobileMenuItems.forEach(i => i.classList.remove('active'));
+            
+            // 添加当前激活状态
+            this.classList.add('active');
+            
+            // 触发频道切换（假设外部有频道切换逻辑）
+            const channel = this.getAttribute('data-channel');
+            if (window.switchChannel) {
+                window.switchChannel(channel);
+            }
+            
+            // 关闭侧边栏
+            closeMobileSidebar();
+        });
+    });
+
+    // ESC 键关闭
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileSidebar.classList.contains('show')) {
+            closeMobileSidebar();
+        }
+    });
+
+    // 主题切换（移动端）
+    const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+    if (mobileThemeToggle) {
+        mobileThemeToggle.addEventListener('click', function() {
+            // 触发主题切换（假设外部有主题切换逻辑）
+            if (window.toggleTheme) {
+                window.toggleTheme();
+            }
+        });
+    }
+})();
+</script>

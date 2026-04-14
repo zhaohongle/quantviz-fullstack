@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索结果 - QuantViz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        /* ========== 顶部导航栏 ========== */
+        .navbar {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .navbar-brand:hover {
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #FFFFFF;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ========== 主容器 ========== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* ========== 搜索头部 ========== */
+        .search-header {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .search-query {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .search-meta {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* ========== 搜索结果列表 ========== */
+        .results-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .stock-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .stock-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stock-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .stock-code {
+            font-size: 14px;
+            color: #6B7280;
+            font-family: 'Courier New', monospace;
+            margin-left: 8px;
+        }
+
+        .stock-price {
+            text-align: right;
+        }
+
+        .price-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .price-change {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .price-change.up {
+            color: #DC2626;
+        }
+
+        .price-change.down {
+            color: #059669;
+        }
+
+        .stock-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* ========== 空状态 ========== */
+        .empty-state {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* ========== 加载状态 ========== */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9CA3AF;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #E5E7EB;
+            border-top-color: #1E3A8A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .search-query {
+                font-size: 20px;
+            }
+
+            .stock-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stock-price {
+                text-align: left;
+                margin-top: 12px;
+            }
+
+            .stock-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='/app.html'">
+            QuantViz
+        </div>
+        <button class="back-btn" onclick="history.back()">
+            ← 返回
+        </button>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 搜索头部 -->
+        <div class="search-header">
+            <div class="search-query" id="searchQuery">搜索：<span id="queryText"></span></div>
+            <div class="search-meta" id="searchMeta">正在搜索...</div>
+        </div>
+
+        <!-- 搜索结果列表 -->
+        <div class="results-list" id="resultsList">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>正在搜索...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 获取URL参数 ==========
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // ========== 执行搜索 ==========
+        async function performSearch(query) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/search?q=${encodeURIComponent(query)}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result.data, query);
+                } else {
+                    showError('搜索失败，请稍后重试');
+                }
+            } catch (error) {
+                console.error('搜索失败:', error);
+                showError('网络错误，请检查后端服务');
+            }
+        }
+
+        // ========== 显示搜索结果 ==========
+        function displayResults(stocks, query) {
+            const queryText = document.getElementById('queryText');
+            const searchMeta = document.getElementById('searchMeta');
+            const resultsList = document.getElementById('resultsList');
+
+            queryText.textContent = query;
+            searchMeta.textContent = `找到 ${stocks.length} 个结果`;
+
+            if (stocks.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">未找到匹配的股票</div>
+                        <div class="empty-text">
+                            试试其他关键词，例如：股票代码（600519）、股票名称（茅台）、拼音首字母（gzmt）
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsList.innerHTML = stocks.map(stock => renderStockCard(stock)).join('');
+        }
+
+        // ========== 渲染股票卡片 ==========
+        function renderStockCard(stock) {
+            const changeClass = stock.changePercent >= 0 ? 'up' : 'down';
+            const changeSymbol = stock.changePercent >= 0 ? '+' : '';
+
+            return `
+                <div class="stock-card" onclick="goToStockDetail('${stock.code}')">
+                    <div class="stock-header">
+                        <div>
+                            <span class="stock-name">${stock.name}</span>
+                            <span class="stock-code">${stock.market} ${stock.code}</span>
+                        </div>
+                        <div class="stock-price">
+                            <div class="price-value">¥${stock.price.toFixed(2)}</div>
+                            <div class="price-change ${changeClass}">
+                                ${changeSymbol}${stock.changePercent.toFixed(2)}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stock-details">
+                        <div class="detail-item">
+                            <div class="detail-label">今开</div>
+                            <div class="detail-value">¥${stock.open.toFixed(2)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">最高</div>
+                            <div class="detail-value">¥${stock.high.toFixed(2)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">最低</div>
+                            <div class="detail-value">¥${stock.low.toFixed(2)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">成交额</div>
+                            <div class="detail-value">${formatAmount(stock.amount)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== 格式化成交额 ==========
+        function formatAmount(amount) {
+            if (amount >= 100000000) {
+                return (amount / 100000000).toFixed(2) + '亿';
+            } else if (amount >= 10000) {
+                return (amount / 10000).toFixed(2) + '万';
+            }
+            return amount.toFixed(0);
+        }
+
+        // ========== 跳转到股票详情页 ==========
+        function goToStockDetail(code) {
+            // TODO: 跳转到股票详情页（待开发）
+            alert(`跳转到股票详情页：${code}\n（该功能待开发）`);
+            // window.location.href = `/pages/stocks/detail.html?code=${code}`;
+        }
+
+        // ========== 显示错误 ==========
+        function showError(message) {
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">❌</div>
+                    <div class="empty-title">搜索失败</div>
+                    <div class="empty-text">${message}</div>
+                </div>
+            `;
+        }
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const query = getQueryParam('q');
+
+            if (!query) {
+                showError('请输入搜索关键词');
+                return;
+            }
+
+            performSearch(query);
+        });
+    </script>
+</body>
+</html>

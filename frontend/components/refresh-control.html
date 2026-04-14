@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<!-- 
+    刷新控制组件 - QuantViz 数据刷新机制
+    用法：在页面中通过 <div id="refresh-control"></div> 占位，
+    然后调用 RefreshManager.init() 初始化
+-->
+<template id="refresh-control-template">
+    <style>
+        .refresh-control-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 10px 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 500;
+            transition: all 0.2s;
+        }
+
+        .refresh-control-container:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 刷新按钮 */
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover:not(:disabled) {
+            background-color: #1E40AF;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .refresh-icon {
+            font-size: 14px;
+            transition: transform 0.5s;
+        }
+
+        .refresh-icon.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 状态信息 */
+        .refresh-status {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-indicator.idle {
+            background-color: #9CA3AF;
+        }
+
+        .status-indicator.loading {
+            background-color: #3B82F6;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.success {
+            background-color: #10B981;
+        }
+
+        .status-indicator.error {
+            background-color: #EF4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .last-update-time {
+            font-size: 11px;
+            color: #9CA3AF;
+        }
+
+        /* 设置按钮 */
+        .settings-btn {
+            background: none;
+            border: none;
+            color: #6B7280;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .settings-btn:hover {
+            background-color: #F3F4F6;
+            color: #1E3A8A;
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            min-width: 240px;
+            display: none;
+            z-index: 501;
+        }
+
+        .settings-panel.show {
+            display: block;
+        }
+
+        .settings-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .settings-option {
+            margin-bottom: 12px;
+        }
+
+        .settings-option:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-label {
+            font-size: 13px;
+            color: #4B5563;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .interval-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .interval-btn {
+            flex: 1;
+            padding: 6px 10px;
+            background-color: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .interval-btn:hover {
+            background-color: #E5E7EB;
+        }
+
+        .interval-btn.active {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            border-color: #1E3A8A;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background-color: #D1D5DB;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-switch.active {
+            background-color: #10B981;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .refresh-control-container {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .refresh-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+
+            .status-text {
+                font-size: 11px;
+            }
+
+            .settings-panel {
+                right: -10px;
+            }
+        }
+    </style>
+
+    <div class="refresh-control-container">
+        <!-- 刷新按钮 -->
+        <button class="refresh-btn" id="refresh-trigger-btn">
+            <span class="refresh-icon">🔄</span>
+            <span>刷新</span>
+        </button>
+
+        <!-- 状态信息 -->
+        <div class="refresh-status">
+            <div class="status-text">
+                <span class="status-indicator idle" id="status-indicator"></span>
+                <span id="status-text">就绪</span>
+            </div>
+            <div class="last-update-time" id="last-update-time">-</div>
+        </div>
+
+        <!-- 设置按钮 -->
+        <button class="settings-btn" id="settings-toggle-btn">⚙️</button>
+
+        <!-- 设置面板 -->
+        <div class="settings-panel" id="settings-panel">
+            <div class="settings-title">刷新设置</div>
+
+            <div class="settings-option">
+                <label class="option-label">自动刷新</label>
+                <div class="toggle-container">
+                    <span style="font-size: 12px; color: #6B7280;">关闭/开启</span>
+                    <div class="toggle-switch" id="auto-refresh-toggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-option">
+                <label class="option-label">刷新间隔</label>
+                <div class="interval-buttons">
+                    <button class="interval-btn" data-interval="30">30秒</button>
+                    <button class="interval-btn active" data-interval="60">60秒</button>
+                    <button class="interval-btn" data-interval="300">5分钟</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    // 如果这个文件被直接加载，初始化模板
+    if (typeof window !== 'undefined') {
+        // 模板已定义在 <template> 标签中，可通过 JavaScript 克隆使用
+        console.log('刷新控制组件模板已加载');
+    }
+</script>

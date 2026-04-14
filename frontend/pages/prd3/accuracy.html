@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>准确率追踪详情 - 量子财富智能交易平台</title>
+    <title>历史准确率追踪 - 量子财富智能交易平台</title>
+    <link rel="stylesheet" href="../../css/dark-theme.css">
     <style>
         * {
             margin: 0;
@@ -13,48 +14,32 @@
 
         body {
             font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
-            background-color: #F9FAFB;
-            color: #111827;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
         }
 
-        .navbar {
+        .header {
             background-color: #1E3A8A;
             color: #FFFFFF;
-            padding: 16px 32px;
+            padding: 20px 32px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 16px;
         }
 
-        .navbar-brand {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .navbar-menu {
-            display: flex;
-            gap: 24px;
-        }
-
-        .nav-link {
+        .back-btn {
+            background: none;
+            border: none;
             color: #FFFFFF;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: opacity 0.2s;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
         }
 
-        .breadcrumb {
-            background-color: #FFFFFF;
-            padding: 12px 32px;
-            border-bottom: 1px solid #E5E7EB;
-            font-size: 14px;
-            color: #6B7280;
-        }
-
-        .breadcrumb a {
-            color: #1E3A8A;
-            text-decoration: none;
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
         }
 
         .container {
@@ -63,499 +48,441 @@
             padding: 32px;
         }
 
-        /* 准确率概览 */
-        .overview-section {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
+        .loading {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--text-sec);
+        }
+
+        /* 总体准确率卡片 */
+        .overall-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 32px;
+            padding: 24px;
             margin-bottom: 24px;
         }
 
         .section-title {
             font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .stats-grid {
+        .accuracy-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
 
-        .stat-card {
-            background-color: #F9FAFB;
-            border: 1px solid #E5E7EB;
+        .accuracy-card {
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
             border-radius: 8px;
             padding: 20px;
+            color: #FFFFFF;
+        }
+
+        .accuracy-period {
+            font-size: 14px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .accuracy-value {
+            font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .accuracy-detail {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .stat-item {
+            flex: 1;
         }
 
         .stat-label {
             font-size: 14px;
-            color: #6B7280;
-            margin-bottom: 8px;
+            color: var(--text-sec);
+            margin-bottom: 4px;
         }
 
         .stat-value {
             font-family: 'DIN', 'Roboto Mono', monospace;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: #1E3A8A;
-            margin-bottom: 8px;
         }
 
-        .stat-detail {
-            font-family: 'DIN', 'Roboto Mono', monospace;
-            font-size: 14px;
-            color: #9CA3AF;
-        }
-
-        .stat-trend {
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .stat-trend.up {
-            color: #10B981;
-        }
-
-        .stat-trend.down {
-            color: #EF4444;
-        }
-
-        .stat-trend.flat {
-            color: #6B7280;
-        }
-
-        /* 趋势图 */
-        .chart-section {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
+        /* 分类准确率 */
+        .category-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 24px;
             margin-bottom: 24px;
         }
 
-        .chart-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+        .category-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
         }
 
-        .chart-btn {
-            padding: 6px 12px;
-            border: 1px solid #E5E7EB;
-            border-radius: 4px;
-            font-size: 12px;
-            background-color: #FFFFFF;
-            color: #6B7280;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .chart-btn.active {
-            background-color: #1E3A8A;
-            color: #FFFFFF;
-            border-color: #1E3A8A;
-        }
-
-        .chart-placeholder {
-            width: 100%;
-            height: 350px;
-            background: linear-gradient(to bottom, #F9FAFB 0%, #FFFFFF 100%);
-            border: 1px dashed #E5E7EB;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #9CA3AF;
-            font-size: 14px;
-        }
-
-        /* 历史记录表格 */
-        .history-section {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
+        .category-item {
+            padding: 16px;
+            background: var(--bg);
             border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
+            border-left: 4px solid #1E3A8A;
         }
 
-        .table-controls {
+        .category-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
-        .filter-group {
-            display: flex;
-            gap: 12px;
-        }
-
-        .filter-select {
-            padding: 6px 12px;
-            border: 1px solid #E5E7EB;
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: #FFFFFF;
-            cursor: pointer;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background-color: #F9FAFB;
+        .category-name {
+            font-size: 16px;
             font-weight: 600;
-            text-align: left;
-            padding: 12px;
-            border-bottom: 2px solid #E5E7EB;
-            font-size: 14px;
+            color: var(--text);
         }
 
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #E5E7EB;
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background-color: #F9FAFB;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-badge.success {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-
-        .status-badge.failed {
-            background-color: #FEE2E2;
-            color: #991B1B;
-        }
-
-        .status-badge.pending {
-            background-color: #FEF3C7;
-            color: #92400E;
-        }
-
-        .table-number {
+        .category-accuracy {
             font-family: 'DIN', 'Roboto Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1E3A8A;
         }
 
-        /* 计算逻辑说明 */
-        .logic-section {
-            background-color: #DBEAFE;
-            border: 1px solid #1E3A8A;
+        .category-count {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* 图表容器 */
+        .chart-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 24px;
+            margin-bottom: 24px;
         }
 
-        .logic-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1E3A8A;
-            margin-bottom: 16px;
+        #trendChart {
+            width: 100%;
+            height: 300px;
         }
 
-        .logic-content {
+        /* 说明文字 */
+        .disclaimer {
+            background-color: #FFFBEB;
+            border: 1px solid #FCD34D;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .disclaimer-title {
             font-size: 14px;
-            color: #1E3A8A;
-            line-height: 1.8;
-        }
-
-        .logic-content h4 {
-            font-size: 15px;
             font-weight: 600;
-            margin: 16px 0 8px 0;
+            color: #92400E;
+            margin-bottom: 8px;
         }
 
-        .logic-content ul {
-            padding-left: 24px;
-            margin: 8px 0;
+        .disclaimer-text {
+            font-size: 13px;
+            color: #78350F;
+            line-height: 1.6;
         }
 
-        .logic-content li {
-            margin-bottom: 6px;
-        }
-
+        /* 响应式 */
         @media (max-width: 768px) {
-            .navbar-menu {
-                display: none;
-            }
-
             .container {
                 padding: 16px;
             }
 
-            .stats-grid {
+            .header {
+                padding: 16px;
+            }
+
+            .accuracy-grid {
                 grid-template-columns: 1fr;
             }
 
-            .chart-controls {
-                flex-wrap: wrap;
+            .stats-row {
+                flex-direction: column;
+                gap: 16px;
             }
 
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px;
+            .category-list {
+                grid-template-columns: 1fr;
             }
         }
     </style>
-    <script src="../../js/api-integration.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">量子财富智能交易平台</div>
-        <div class="navbar-menu">
-            <a href="#" class="nav-link">全球指数</a>
-            <a href="#" class="nav-link">板块资金流向</a>
-            <a href="#" class="nav-link active">AI 精选推荐</a>
-            <a href="#" class="nav-link">自选股</a>
-        </div>
-    </nav>
-
-    <div class="breadcrumb">
-        <a href="#">首页</a> / <a href="#">AI 精选推荐</a> / 准确率追踪详情
+    <div class="header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📊 历史准确率追踪</h1>
     </div>
 
     <div class="container">
-        <!-- 准确率概览 -->
-        <div class="overview-section">
-            <div class="section-title">📊 准确率概览</div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">7 日准确率</div>
-                    <div class="stat-value">58%</div>
-                    <div class="stat-detail">(12/21 达标)</div>
-                    <div class="stat-trend up">↗ 较上周 +3%</div>
+        <div id="loading" class="loading">
+            加载中...
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- 总体准确率 -->
+            <div class="overall-section">
+                <h2 class="section-title">📈 总体准确率</h2>
+                <div class="accuracy-grid">
+                    <div class="accuracy-card">
+                        <div class="accuracy-period">近 30 天</div>
+                        <div class="accuracy-value" id="accuracy30d"></div>
+                        <div class="accuracy-detail" id="detail30d"></div>
+                    </div>
+                    <div class="accuracy-card">
+                        <div class="accuracy-period">近 60 天</div>
+                        <div class="accuracy-value" id="accuracy60d"></div>
+                        <div class="accuracy-detail" id="detail60d"></div>
+                    </div>
+                    <div class="accuracy-card">
+                        <div class="accuracy-period">近 90 天</div>
+                        <div class="accuracy-value" id="accuracy90d"></div>
+                        <div class="accuracy-detail" id="detail90d"></div>
+                    </div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-label">30 日准确率</div>
-                    <div class="stat-value">55%</div>
-                    <div class="stat-detail">(48/87 达标)</div>
-                    <div class="stat-trend flat">→ 持平</div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">总推荐数（30天）</div>
+                        <div class="stat-value" id="totalRecs"></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">盈利推荐</div>
+                        <div class="stat-value" id="profitableRecs"></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">平均收益率</div>
+                        <div class="stat-value" style="color: #10B981;" id="avgReturn"></div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="stat-card">
-                    <div class="stat-label">90 日准确率</div>
-                    <div class="stat-value">52%</div>
-                    <div class="stat-detail">(128/246 达标)</div>
-                    <div class="stat-trend down">↘ 较上季度 -2%</div>
-                </div>
+            <!-- 分类准确率 -->
+            <div class="category-section">
+                <h2 class="section-title">🎯 分类准确率</h2>
+                <div class="category-list" id="categoryList"></div>
+            </div>
 
-                <div class="stat-card">
-                    <div class="stat-label">累计推荐</div>
-                    <div class="stat-value">246</div>
-                    <div class="stat-detail">近 90 日</div>
-                </div>
+            <!-- 趋势图表 -->
+            <div class="chart-section">
+                <h2 class="section-title">📉 近 7 天准确率趋势</h2>
+                <div id="trendChart"></div>
+            </div>
 
-                <div class="stat-card">
-                    <div class="stat-label">平均收益</div>
-                    <div class="stat-value">+8.3%</div>
-                    <div class="stat-detail">达标推荐平均</div>
-                    <div class="stat-trend up">↗ 超目标 +3.3%</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-label">最大收益</div>
-                    <div class="stat-value">+25.7%</div>
-                    <div class="stat-detail">北方华创（2026-03-15）</div>
+            <!-- 说明 -->
+            <div class="disclaimer">
+                <div class="disclaimer-title">📋 数据说明</div>
+                <div class="disclaimer-text">
+                    • 准确率定义：推荐股票在 T+5 日内达到目标价或收益率 > 5% 视为成功<br>
+                    • 数据更新：每日交易结束后更新（15:30）<br>
+                    • 统计范围：仅统计"推荐买入"及以上级别的推荐<br>
+                    • 风险提示：历史业绩不代表未来收益，投资需谨慎
                 </div>
             </div>
         </div>
-
-        <!-- 准确率趋势图 -->
-        <div class="chart-section">
-            <div class="section-title">📈 准确率趋势</div>
-            <div class="chart-controls">
-                <button class="chart-btn">近7日</button>
-                <button class="chart-btn active">近30日</button>
-                <button class="chart-btn">近90日</button>
-                <button class="chart-btn">全部</button>
-            </div>
-            <div class="chart-placeholder">
-                📊 准确率趋势折线图（建议使用 ECharts 折线图）<br>
-                显示每日准确率变化趋势 + 平均收益趋势
-            </div>
-        </div>
-
-        <!-- 历史推荐记录 -->
-        <div class="history-section">
-            <div class="table-controls">
-                <div class="section-title">📋 历史推荐记录</div>
-                <div class="filter-group">
-                    <select class="filter-select">
-                        <option>全部状态</option>
-                        <option>达标</option>
-                        <option>未达标</option>
-                        <option>进行中</option>
-                    </select>
-                    <select class="filter-select">
-                        <option>按日期排序</option>
-                        <option>按收益排序</option>
-                        <option>按准确率排序</option>
-                    </select>
-                </div>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>推荐日期</th>
-                        <th>股票名称</th>
-                        <th>推荐等级</th>
-                        <th>买入价</th>
-                        <th>目标价</th>
-                        <th>止损价</th>
-                        <th>实际收益</th>
-                        <th>状态</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2026-04-10</td>
-                        <td>药明康德 (603259)</td>
-                        <td>⭐⭐⭐</td>
-                        <td class="table-number">¥100</td>
-                        <td class="table-number">¥115</td>
-                        <td class="table-number">¥95</td>
-                        <td class="table-number" style="color: #EF4444;">+12.5%</td>
-                        <td><span class="status-badge success">✅ 达标</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-09</td>
-                        <td>北方华创 (002371)</td>
-                        <td>⭐⭐⭐</td>
-                        <td class="table-number">¥310</td>
-                        <td class="table-number">¥350</td>
-                        <td class="table-number">¥290</td>
-                        <td class="table-number" style="color: #EF4444;">+8.3%</td>
-                        <td><span class="status-badge pending">⏳ 进行中</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-08</td>
-                        <td>宁德时代 (300750)</td>
-                        <td>⭐⭐</td>
-                        <td class="table-number">¥180</td>
-                        <td class="table-number">¥200</td>
-                        <td class="table-number">¥170</td>
-                        <td class="table-number" style="color: #10B981;">-3.2%</td>
-                        <td><span class="status-badge failed">❌ 未达标</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-07</td>
-                        <td>海康威视 (002415)</td>
-                        <td>⭐⭐</td>
-                        <td class="table-number">¥37</td>
-                        <td class="table-number">¥42</td>
-                        <td class="table-number">¥35</td>
-                        <td class="table-number" style="color: #EF4444;">+5.4%</td>
-                        <td><span class="status-badge pending">⏳ 进行中</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-06</td>
-                        <td>隆基绿能 (601012)</td>
-                        <td>⭐</td>
-                        <td class="table-number">¥21</td>
-                        <td class="table-number">¥25</td>
-                        <td class="table-number">¥20</td>
-                        <td class="table-number" style="color: #10B981;">-4.8%</td>
-                        <td><span class="status-badge failed">❌ 未达标</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-05</td>
-                        <td>中芯国际 (688981)</td>
-                        <td>⭐⭐⭐</td>
-                        <td class="table-number">¥54</td>
-                        <td class="table-number">¥62</td>
-                        <td class="table-number">¥50</td>
-                        <td class="table-number" style="color: #EF4444;">+15.2%</td>
-                        <td><span class="status-badge success">✅ 达标</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-04</td>
-                        <td>韦尔股份 (603501)</td>
-                        <td>⭐⭐</td>
-                        <td class="table-number">¥105</td>
-                        <td class="table-number">¥120</td>
-                        <td class="table-number">¥98</td>
-                        <td class="table-number" style="color: #EF4444;">+7.6%</td>
-                        <td><span class="status-badge pending">⏳ 进行中</span></td>
-                    </tr>
-                    <tr>
-                        <td>2026-04-03</td>
-                        <td>长电科技 (600584)</td>
-                        <td>⭐⭐</td>
-                        <td class="table-number">¥27</td>
-                        <td class="table-number">¥30</td>
-                        <td class="table-number">¥25</td>
-                        <td class="table-number" style="color: #EF4444;">+11.1%</td>
-                        <td><span class="status-badge success">✅ 达标</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- 计算逻辑说明 -->
-        <div class="logic-section">
-            <div class="logic-title">📖 准确率计算逻辑</div>
-            <div class="logic-content">
-                <h4>1. 达标判定标准</h4>
-                <ul>
-                    <li><strong>✅ 达标：</strong>推荐后30日内，股价达到或超过目标价</li>
-                    <li><strong>❌ 未达标：</strong>推荐后30日内触及止损价，或30日后未达目标价</li>
-                    <li><strong>⏳ 进行中：</strong>推荐后不足30日，且未触发达标/未达标条件</li>
-                </ul>
-
-                <h4>2. 准确率计算公式</h4>
-                <ul>
-                    <li>准确率 = 达标数量 / (达标数量 + 未达标数量) × 100%</li>
-                    <li>进行中的推荐不计入准确率统计</li>
-                </ul>
-
-                <h4>3. 收益计算方式</h4>
-                <ul>
-                    <li>实际收益 = (当前价 - 买入价) / 买入价 × 100%</li>
-                    <li>达标推荐：以达到目标价时的收益为准</li>
-                    <li>未达标推荐：以触及止损价或30日后收盘价为准</li>
-                </ul>
-
-                <h4>4. 时间区间说明</h4>
-                <ul>
-                    <li><strong>7日准确率：</strong>近7日推荐中已结算的推荐（达标+未达标）</li>
-                    <li><strong>30日准确率：</strong>近30日推荐中已结算的推荐</li>
-                    <li><strong>90日准确率：</strong>近90日推荐中已结算的推荐</li>
-                </ul>
-
-                <h4>5. 透明化原则</h4>
-                <ul>
-                    <li>所有推荐记录永久保留，不删除不隐藏</li>
-                    <li>准确率实时更新，无人工调整</li>
-                    <li>计算逻辑公开透明，用户可自行验证</li>
-                </ul>
-            </div>
-        </div>
-    <script src="accuracy-api.js"></script>
     </div>
+
+    <script>
+        loadAccuracyData();
+
+        async function loadAccuracyData() {
+            try {
+                const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:3000'
+                    : 'https://quantviz-fullstack-nkxq.vercel.app';
+
+                const response = await fetch(`${API_BASE}/api/recommendations/accuracy`);
+                
+                if (!response.ok) {
+                    throw new Error('获取准确率数据失败');
+                }
+
+                const result = await response.json();
+                const data = result.data;
+
+                // 填充总体准确率
+                document.getElementById('accuracy30d').textContent = `${data.overall.accuracy30d.toFixed(1)}%`;
+                document.getElementById('detail30d').textContent = `${data.overall.profitable30d}/${data.overall.totalRecommendations30d} 命中`;
+
+                document.getElementById('accuracy60d').textContent = `${data.overall.accuracy60d.toFixed(1)}%`;
+                document.getElementById('detail60d').textContent = `${data.overall.profitable60d}/${data.overall.totalRecommendations60d} 命中`;
+
+                document.getElementById('accuracy90d').textContent = `${data.overall.accuracy90d.toFixed(1)}%`;
+                document.getElementById('detail90d').textContent = `${data.overall.profitable90d}/${data.overall.totalRecommendations90d} 命中`;
+
+                // 填充统计数据
+                document.getElementById('totalRecs').textContent = data.overall.totalRecommendations30d;
+                document.getElementById('profitableRecs').textContent = data.overall.profitable30d;
+                document.getElementById('avgReturn').textContent = `+${data.overall.avgReturn}%`;
+
+                // 填充分类准确率
+                const categoryList = document.getElementById('categoryList');
+                categoryList.innerHTML = Object.entries(data.byCategory).map(([name, stats]) => {
+                    const accuracy = parseFloat(stats.accuracy);
+                    return `
+                        <div class="category-item">
+                            <div class="category-header">
+                                <span class="category-name">${name}</span>
+                                <span class="category-accuracy">${accuracy.toFixed(1)}%</span>
+                            </div>
+                            <div class="category-count">样本数: ${stats.count} 个</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${accuracy}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // 绘制趋势图
+                renderTrendChart(data.recentPerformance);
+
+                // 显示内容
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('加载失败:', error);
+                document.getElementById('loading').innerHTML = '❌ 加载失败，请稍后重试';
+            }
+        }
+
+        function renderTrendChart(recentData) {
+            const chart = echarts.init(document.getElementById('trendChart'));
+            
+            const dates = recentData.map(d => d.date.slice(5)); // 只保留 MM-DD
+            const accuracies = recentData.map(d => parseFloat(d.accuracy));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        return `${params[0].axisValue}<br/>准确率: ${params[0].value}%`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: dates,
+                    axisLabel: {
+                        color: '#6B7280'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#E5E7EB'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '准确率 (%)',
+                    min: 0,
+                    max: 100,
+                    axisLabel: {
+                        color: '#6B7280',
+                        formatter: '{value}%'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#E5E7EB'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#E5E7EB'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        data: accuracies,
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        lineStyle: {
+                            color: '#1E3A8A',
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: '#1E3A8A'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0,
+                                    color: 'rgba(30, 58, 138, 0.3)'
+                                }, {
+                                    offset: 1,
+                                    color: 'rgba(30, 58, 138, 0.05)'
+                                }]
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+            
+            // 响应式
+            window.addEventListener('resize', () => {
+                chart.resize();
+            });
+        }
+    </script>
 </body>
 </html>

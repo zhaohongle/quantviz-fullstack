@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户设置 - QuantViz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Source Han Sans CN', 'Roboto', -apple-system, sans-serif;
+      background-color: #F9FAFB;
+      color: #111827;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background-color: #1E3A8A;
+      color: #FFFFFF;
+      padding: 24px 32px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .settings-section {
+      background-color: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #E5E7EB;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info {
+      flex: 1;
+    }
+
+    .setting-label {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    .setting-description {
+      font-size: 13px;
+      color: #6B7280;
+    }
+
+    .setting-control {
+      margin-left: 32px;
+    }
+
+    /* 选择按钮组 */
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .option-btn {
+      padding: 8px 16px;
+      background-color: #F3F4F6;
+      border: 2px solid #E5E7EB;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    .option-btn:hover {
+      background-color: #E5E7EB;
+      border-color: #D1D5DB;
+    }
+
+    .option-btn.active {
+      background-color: #1E3A8A;
+      border-color: #1E3A8A;
+      color: #FFFFFF;
+    }
+
+    /* 开关按钮 */
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background-color: #D1D5DB;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-switch.active {
+      background-color: #10B981;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background-color: #FFFFFF;
+      border-radius: 12px;
+      transition: transform 0.3s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(24px);
+    }
+
+    /* 操作按钮 */
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #1E3A8A;
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background-color: #1E40AF;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: #F3F4F6;
+      color: #374151;
+      border: 1px solid #D1D5DB;
+    }
+
+    .btn-secondary:hover {
+      background-color: #E5E7EB;
+    }
+
+    .btn-danger {
+      background-color: #FEE2E2;
+      color: #DC2626;
+      border: 1px solid #FCA5A5;
+    }
+
+    .btn-danger:hover {
+      background-color: #FECACA;
+    }
+
+    /* 通知提示 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #10B981;
+      color: #FFFFFF;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: none;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .settings-section {
+        padding: 16px;
+      }
+
+      .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .setting-control {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .button-group {
+        width: 100%;
+      }
+
+      .option-btn {
+        flex: 1;
+        text-align: center;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 页面标题 -->
+    <div class="header">
+      <h1>⚙️ 用户设置</h1>
+      <p>个性化您的 QuantViz 体验</p>
+    </div>
+
+    <!-- 1. 刷新设置 -->
+    <div class="settings-section">
+      <div class="section-title">🔄 刷新设置</div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">自动刷新</div>
+          <div class="setting-description">自动更新实时行情数据</div>
+        </div>
+        <div class="setting-control">
+          <div class="toggle-switch" id="autoRefreshToggle" onclick="toggleAutoRefresh()"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">刷新间隔</div>
+          <div class="setting-description">设置自动刷新的时间间隔</div>
+        </div>
+        <div class="setting-control">
+          <div class="button-group" id="refreshIntervalGroup">
+            <button class="option-btn" data-value="30" onclick="setRefreshInterval(30)">30秒</button>
+            <button class="option-btn" data-value="60" onclick="setRefreshInterval(60)">60秒</button>
+            <button class="option-btn" data-value="300" onclick="setRefreshInterval(300)">5分钟</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 显示设置 -->
+    <div class="settings-section">
+      <div class="section-title">📊 显示设置</div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">数据精度</div>
+          <div class="setting-description">设置价格显示的小数位数</div>
+        </div>
+        <div class="setting-control">
+          <div class="button-group" id="precisionGroup">
+            <button class="option-btn" data-value="0" onclick="setPrecision(0)">整数</button>
+            <button class="option-btn" data-value="2" onclick="setPrecision(2)">2位小数</button>
+            <button class="option-btn" data-value="4" onclick="setPrecision(4)">4位小数</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">涨跌颜色</div>
+          <div class="setting-description">选择涨跌的颜色方案</div>
+        </div>
+        <div class="setting-control">
+          <div class="button-group" id="colorSchemeGroup">
+            <button class="option-btn" data-value="red-green" onclick="setColorScheme('red-green')">红涨绿跌</button>
+            <button class="option-btn" data-value="green-red" onclick="setColorScheme('green-red')">绿涨红跌</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 通知设置 -->
+    <div class="settings-section">
+      <div class="section-title">🔔 通知设置</div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">价格提醒</div>
+          <div class="setting-description">自选股价格到达预警时发送通知</div>
+        </div>
+        <div class="setting-control">
+          <div class="toggle-switch" id="priceAlertToggle" onclick="togglePriceAlert()"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">消息推送</div>
+          <div class="setting-description">接收系统消息和重要提醒</div>
+        </div>
+        <div class="setting-control">
+          <div class="toggle-switch" id="pushNotificationToggle" onclick="togglePushNotification()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+      <button class="btn btn-primary" onclick="saveSettings()">💾 保存设置</button>
+      <button class="btn btn-secondary" onclick="resetSettings()">🔄 恢复默认</button>
+      <button class="btn btn-danger" onclick="clearCache()">🗑️ 清除缓存</button>
+    </div>
+  </div>
+
+  <!-- 通知提示 -->
+  <div class="toast" id="toast">
+    <span id="toastMessage">✓ 设置已保存</span>
+  </div>
+
+  <script>
+    // ========== 默认设置 ==========
+    const DEFAULT_SETTINGS = {
+      autoRefresh: true,
+      refreshInterval: 60,
+      precision: 2,
+      colorScheme: 'red-green',
+      priceAlert: true,
+      pushNotification: false
+    };
+
+    // 当前设置
+    let currentSettings = { ...DEFAULT_SETTINGS };
+
+    // ========== 初始化 ==========
+    function init() {
+      loadSettings();
+      updateUI();
+      applySettings();
+      console.log('✅ 设置页面初始化完成', currentSettings);
+    }
+
+    // ========== LocalStorage 操作 ==========
+    function loadSettings() {
+      try {
+        const saved = localStorage.getItem('quantviz_settings');
+        if (saved) {
+          currentSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+          console.log('📥 已加载用户设置:', currentSettings);
+        }
+      } catch (error) {
+        console.error('加载设置失败:', error);
+      }
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem('quantviz_settings', JSON.stringify(currentSettings));
+        showToast('✓ 设置已保存');
+        
+        // 触发自定义事件，通知其他页面设置已更新
+        window.dispatchEvent(new CustomEvent('settingsUpdated', { 
+          detail: currentSettings 
+        }));
+        
+        console.log('💾 设置已保存:', currentSettings);
+      } catch (error) {
+        console.error('保存设置失败:', error);
+        showToast('❌ 保存失败', 'error');
+      }
+    }
+
+    function resetSettings() {
+      if (confirm('确定要恢复默认设置吗？')) {
+        currentSettings = { ...DEFAULT_SETTINGS };
+        saveSettings();
+        updateUI();
+        applySettings();
+        showToast('🔄 已恢复默认设置');
+      }
+    }
+
+    function clearCache() {
+      if (confirm('确定要清除所有缓存数据吗？这将清除自选股、历史记录等数据。')) {
+        try {
+          // 清除所有 LocalStorage（除了设置本身）
+          const settings = localStorage.getItem('quantviz_settings');
+          localStorage.clear();
+          if (settings) {
+            localStorage.setItem('quantviz_settings', settings);
+          }
+          
+          // 清除 SessionStorage
+          sessionStorage.clear();
+          
+          showToast('🗑️ 缓存已清除');
+          console.log('🗑️ 缓存已清除');
+        } catch (error) {
+          console.error('清除缓存失败:', error);
+          showToast('❌ 清除失败', 'error');
+        }
+      }
+    }
+
+    // ========== UI 更新 ==========
+    function updateUI() {
+      // 更新自动刷新开关
+      document.getElementById('autoRefreshToggle').classList.toggle('active', currentSettings.autoRefresh);
+
+      // 更新刷新间隔按钮
+      document.querySelectorAll('#refreshIntervalGroup .option-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.value) === currentSettings.refreshInterval);
+      });
+
+      // 更新数据精度按钮
+      document.querySelectorAll('#precisionGroup .option-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.value) === currentSettings.precision);
+      });
+
+      // 更新颜色方案按钮
+      document.querySelectorAll('#colorSchemeGroup .option-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === currentSettings.colorScheme);
+      });
+
+      // 更新通知开关
+      document.getElementById('priceAlertToggle').classList.toggle('active', currentSettings.priceAlert);
+      document.getElementById('pushNotificationToggle').classList.toggle('active', currentSettings.pushNotification);
+    }
+
+    // ========== 设置应用 ==========
+    function applySettings() {
+      // 应用到 RefreshManager（如果存在）
+      if (window.RefreshManager) {
+        window.RefreshManager.config.autoRefresh = currentSettings.autoRefresh;
+        window.RefreshManager.config.interval = currentSettings.refreshInterval;
+        
+        if (currentSettings.autoRefresh) {
+          window.RefreshManager.start();
+        } else {
+          window.RefreshManager.stop();
+        }
+      }
+
+      // 应用颜色方案到全局
+      document.documentElement.setAttribute('data-color-scheme', currentSettings.colorScheme);
+
+      console.log('✨ 设置已应用');
+    }
+
+    // ========== 设置项操作 ==========
+    function toggleAutoRefresh() {
+      currentSettings.autoRefresh = !currentSettings.autoRefresh;
+      updateUI();
+      saveSettings();
+      applySettings();
+    }
+
+    function setRefreshInterval(seconds) {
+      currentSettings.refreshInterval = seconds;
+      updateUI();
+      saveSettings();
+      applySettings();
+    }
+
+    function setPrecision(digits) {
+      currentSettings.precision = digits;
+      updateUI();
+      saveSettings();
+      applySettings();
+    }
+
+    function setColorScheme(scheme) {
+      currentSettings.colorScheme = scheme;
+      updateUI();
+      saveSettings();
+      applySettings();
+    }
+
+    function togglePriceAlert() {
+      currentSettings.priceAlert = !currentSettings.priceAlert;
+      
+      // 请求浏览器通知权限
+      if (currentSettings.priceAlert && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission().then(permission => {
+            if (permission !== 'granted') {
+              currentSettings.priceAlert = false;
+              updateUI();
+              showToast('❌ 通知权限被拒绝', 'error');
+            } else {
+              updateUI();
+              saveSettings();
+            }
+          });
+          return;
+        }
+      }
+      
+      updateUI();
+      saveSettings();
+    }
+
+    function togglePushNotification() {
+      currentSettings.pushNotification = !currentSettings.pushNotification;
+      
+      // 请求浏览器通知权限
+      if (currentSettings.pushNotification && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission().then(permission => {
+            if (permission !== 'granted') {
+              currentSettings.pushNotification = false;
+              updateUI();
+              showToast('❌ 通知权限被拒绝', 'error');
+            } else {
+              updateUI();
+              saveSettings();
+            }
+          });
+          return;
+        }
+      }
+      
+      updateUI();
+      saveSettings();
+    }
+
+    // ========== Toast 通知 ==========
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      toastMessage.textContent = message;
+      toast.style.backgroundColor = type === 'error' ? '#EF4444' : '#10B981';
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // ========== 页面加载时初始化 ==========
+    document.addEventListener('DOMContentLoaded', init);
+
+    // ========== 导出全局对象（供其他页面调用） ==========
+    window.QuantVizSettings = {
+      get: () => currentSettings,
+      save: saveSettings,
+      reset: resetSettings
+    };
+  </script>
+</body>
+</html>

@@ -16,6 +16,10 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 const indicesRouter = require('./routes/indices');
 const newsRouter = require('./routes/news');
 const sectorsRouter = require('./routes/sectors');
+const recommendationRouter = require('./routes/recommendations');
+const filterRouter = require('./routes/filter');
+const searchRouter = require('./routes/search');
+const watchlistRouter = require('./routes/watchlist');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -77,6 +81,10 @@ app.get('/api', (req, res) => {
 app.use('/api/indices', indicesRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/sectors', sectorsRouter);
+app.use('/api/recommendations', recommendationRouter);
+app.use('/api/filter', filterRouter);
+app.use('/api/search', searchRouter);
+app.use('/api/watchlist', watchlistRouter);
 
 // ========== 错误处理 ==========
 app.use(notFound);

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - QuantViz</title>
+    <link rel="stylesheet" href="../css/dark-theme.css">
+    <style>
+        /* ========== 首页专属样式 ========== */
+        .home-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ========== 指数卡片行 ========== */
+        .index-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* ========== 推荐股票网格 ========== */
+        .stocks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        /* ========== 市场热点 ========== */
+        .hotspot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hotspot-item {
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hotspot-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-dim);
+            transform: translateX(4px);
+        }
+
+        .hotspot-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .hotspot-time {
+            font-size: 12px;
+            color: var(--text-sec);
+            font-family: var(--mono);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 1200px) {
+            .index-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stocks-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .index-row {
+                grid-template-columns: 1fr;
+                overflow-x: auto;
+                display: flex;
+                scroll-snap-type: x mandatory;
+                gap: 12px;
+                padding-bottom: 12px;
+            }
+            
+            .index-row > * {
+                min-width: 280px;
+                scroll-snap-align: start;
+            }
+            
+            .stocks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="home-layout">
+        <!-- 关键指数卡片 -->
+        <section>
+            <h2 class="section-title" style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: var(--text);">
+                📈 关键指数
+            </h2>
+            <div class="index-row" id="indexCards">
+                <!-- 指数卡片将通过 JS 动态生成 -->
+            </div>
+        </section>
+
+        <!-- 推荐股票 -->
+        <section>
+            <h2 class="section-title" style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+                ⭐ 今日推荐
+                <span class="badge badge-primary">AI 精选</span>
+            </h2>
+            <div class="stocks-grid" id="stocksGrid">
+                <!-- 股票卡片将通过 JS 动态生成 -->
+            </div>
+        </section>
+
+        <!-- 市场热点 -->
+        <section>
+            <h2 class="section-title" style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: var(--text);">
+                🔥 市场热点
+            </h2>
+            <div class="glass-card" style="padding: 20px;">
+                <div class="hotspot-list" id="hotspotList">
+                    <!-- 热点将通过 JS 动态生成 -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ========== 模拟数据 ==========
+        const mockIndices = [
+            { code: 'SSE', name: '上证指数', value: 3287.65, change: 1.23, changePercent: 0.38, high: 3295.12, low: 3268.45 },
+            { code: 'SZSE', name: '深证成指', value: 10876.54, change: -45.67, changePercent: -0.42, high: 10925.33, low: 10852.11 },
+            { code: 'HSI', name: '恒生指数', value: 18234.56, change: 156.78, changePercent: 0.87, high: 18289.45, low: 18125.67 },
+            { code: 'SPX', name: '标普500', value: 4567.89, change: 23.45, changePercent: 0.52, high: 4578.12, low: 4542.33 }
+        ];
+
+        const mockStocks = [
+            { code: '600519', name: '贵州茅台', price: 1678.50, change: 15.30, changePercent: 0.92, volume: 12345678, amount: 207000000000 },
+            { code: '000001', name: '平安银行', price: 12.45, change: -0.15, changePercent: -1.19, volume: 98765432, amount: 1230000000 },
+            { code: '000858', name: '五粮液', price: 145.67, change: 3.21, changePercent: 2.25, volume: 23456789, amount: 3420000000 },
+            { code: '601318', name: '中国平安', price: 45.89, change: 1.23, changePercent: 2.76, volume: 45678901, amount: 2100000000 },
+            { code: '600036', name: '招商银行', price: 34.56, change: -0.78, changePercent: -2.21, volume: 34567890, amount: 1200000000 },
+            { code: '002594', name: '比亚迪', price: 245.67, change: 8.90, changePercent: 3.76, volume: 56789012, amount: 13940000000 }
+        ];
+
+        const mockHotspots = [
+            { title: 'AI 芯片板块持续走强，多只个股涨停', time: '14:23' },
+            { title: '新能源汽车销量数据超预期，概念股集体上涨', time: '13:45' },
+            { title: '央行降息25个基点，市场情绪明显回暖', time: '12:10' },
+            { title: '北向资金净流入超100亿，连续5日加仓', time: '11:30' },
+            { title: '科创板成交额创新高，市场活跃度提升', time: '10:15' }
+        ];
+
+        // ========== 渲染指数卡片 ==========
+        function renderIndexCards() {
+            const container = document.getElementById('indexCards');
+            container.innerHTML = '';
+            
+            mockIndices.forEach(index => {
+                const card = document.createElement('div');
+                card.className = `glass-card index-card ${index.change >= 0 ? 'up' : 'down'}`;
+                card.style.padding = '20px';
+                card.style.cursor = 'pointer';
+                card.style.position = 'relative';
+                
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="font-size: 13px; color: var(--text-sec); font-weight: 500;">${index.name}</span>
+                        <span class="live-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--up);"></span>
+                    </div>
+                    
+                    <div style="font-family: var(--mono); font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; color: ${index.change >= 0 ? 'var(--up)' : 'var(--down)'};">
+                        ${index.value.toFixed(2)}
+                    </div>
+                    
+                    <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+                        <span style="font-family: var(--mono); font-size: 16px; font-weight: 600; color: ${index.change >= 0 ? 'var(--up)' : 'var(--down)'};">
+                            ${index.change >= 0 ? '+' : ''}${index.changePercent.toFixed(2)}%
+                        </span>
+                        <span style="font-family: var(--mono); font-size: 12px; color: var(--text-sec);">
+                            ${index.change >= 0 ? '+' : ''}${index.change.toFixed(2)}
+                        </span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px; font-size: 11px; color: var(--text-sec);">
+                        <span>
+                            <span>高</span>
+                            <span style="font-family: var(--mono); font-weight: 600; margin-left: 4px;">${index.high.toFixed(2)}</span>
+                        </span>
+                        <span>
+                            <span>低</span>
+                            <span style="font-family: var(--mono); font-weight: 600; margin-left: 4px;">${index.low.toFixed(2)}</span>
+                        </span>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // ========== 渲染股票卡片 ==========
+        function renderStockCards() {
+            const container = document.getElementById('stocksGrid');
+            container.innerHTML = '';
+            
+            mockStocks.forEach(stock => {
+                const card = document.createElement('div');
+                card.className = `glass-card stock-card`;
+                card.style.padding = '20px';
+                card.style.cursor = 'pointer';
+                card.style.display = 'flex';
+                card.style.flexDirection = 'column';
+                card.style.gap = '12px';
+                
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-family: var(--mono); font-size: 12px; color: var(--primary); font-weight: 600;">${stock.code}</span>
+                            <span style="font-size: 16px; font-weight: 600; color: var(--text);">${stock.name}</span>
+                        </div>
+                        <button class="btn-icon" style="width: 32px; height: 32px; opacity: 0.5;">⭐</button>
+                    </div>
+                    
+                    <div style="padding: 12px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+                        <div style="font-family: var(--mono); font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 6px; color: ${stock.change >= 0 ? 'var(--up)' : 'var(--down)'};">
+                            ${stock.price.toFixed(2)}
+                        </div>
+                        <div style="font-family: var(--mono); font-size: 14px; font-weight: 600; color: ${stock.change >= 0 ? 'var(--up)' : 'var(--down)'};">
+                            ${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)} (${stock.changePercent.toFixed(2)}%)
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 11px; color: var(--text-sec); text-transform: uppercase;">成交量</span>
+                            <span style="font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text);">
+                                ${formatNumber(stock.volume)}
+                            </span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 11px; color: var(--text-sec); text-transform: uppercase;">成交额</span>
+                            <span style="font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text);">
+                                ${formatAmount(stock.amount)}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; margin-top: auto;">
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 14px; font-size: 12px;">详情</button>
+                        <button class="btn btn-primary" style="flex: 1; padding: 6px 14px; font-size: 12px;">交易</button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // ========== 渲染市场热点 ==========
+        function renderHotspots() {
+            const container = document.getElementById('hotspotList');
+            container.innerHTML = '';
+            
+            mockHotspots.forEach(hotspot => {
+                const item = document.createElement('div');
+                item.className = 'hotspot-item';
+                item.innerHTML = `
+                    <span class="hotspot-title">${hotspot.title}</span>
+                    <span class="hotspot-time">${hotspot.time}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // ========== 工具函数 ==========
+        function formatNumber(num) {
+            if (num >= 100000000) return (num / 100000000).toFixed(2) + '亿';
+            if (num >= 10000) return (num / 10000).toFixed(2) + '万';
+            return num.toFixed(0);
+        }
+
+        function formatAmount(amount) {
+            if (amount >= 100000000) return (amount / 100000000).toFixed(2) + '亿';
+            if (amount >= 10000) return (amount / 10000).toFixed(2) + '万';
+            return amount.toFixed(0);
+        }
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIndexCards();
+            renderStockCards();
+            renderHotspots();
+            
+            // 添加脉冲动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.4; transform: scale(1.3); }
+                }
+                .live-dot {
+                    animation: pulse 2s infinite;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

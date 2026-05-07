@@ -2,9 +2,13 @@
 // 从后端API加载实时数据,替代mock数据
 
 // API配置
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3000/api'
-  : 'https://quantviz-fullstack.onrender.com/api';  // Render后端API
+const API_BASE = window.QUANTVIZ_API_BASE || (
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000/api'
+    : window.location.hostname.includes('vercel.app')
+      ? 'https://quantviz-fullstack.onrender.com/api'
+      : '/api'
+);
 
 // ========== 数据生成工具函数 ==========
 // 生成K线数据
